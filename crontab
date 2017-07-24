@@ -1,0 +1,1 @@
+0 0 24 * * env - `cat /etc/docker-env` php /workdir/certs-update.php > /var/log/cert-update.log 2>&1
