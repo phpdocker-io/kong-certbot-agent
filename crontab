@@ -1,1 +1,2 @@
-0 0 24 * * env - `cat /etc/docker-env` php /workdir/certs-update.php > /var/log/cert-update.log 2>&1
+# /etc/docker-env is a dump of the environment made at entrypoint.sh, required as
+0 0 24 * * env - `cat /etc/docker-env` /workdir/certbot-agent.php certs:update $KONG_ENDPOINT $EMAIL $DOMAINS  > /var/log/cert-update.log 2>&1

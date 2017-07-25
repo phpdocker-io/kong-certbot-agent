@@ -69,13 +69,11 @@ class UpdateCertificatesCommand extends Command
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
 
-        VarDumper::dump($testCert);
-
         // Compose cerbot command & execute
         $renewCmd = escapeshellcmd(sprintf(
             'certbot certonly %s --agree-tos --standalone -n -m %s --expand %s',
-            $email,
             $testCert ? '--test-cert' : '',
+            $email,
             '-d ' . implode(' -d ', $domains)
         ));
 
