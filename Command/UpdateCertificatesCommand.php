@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Handles requesting certificates for a given list of domains off Let's Encrypt via certbot's standalone method - it
