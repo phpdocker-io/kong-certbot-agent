@@ -1,0 +1,59 @@
+# You must create an API in kong pointing to this service and tied to /.well-known/acme-challenge
+# it will always be inaccessible as certbot standalone is the http server, and only exists while
+# it's trying to acquire certificates
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-certbot-agent
+spec:
+  type: NodePort
+  ports:
+  - name: certbot
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: certbot-ssl
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  selector:
+    app: kong-certbot
+
+---
+
+# Make sure you edit your config below at the environment vars
+# Take note of the namespace below, and change as needed
+
+apiVersion: batch/v2alpha1
+kind: ScheduledJob
+metadata:
+  name: kong-certbot-agent
+spec:
+  # Run job at 01:07 every 30 days
+  schedule: "7 1 */30 * * "
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          concurrencyPolicy: Forbid
+          restartPolicy: OnFailure
+          containers:
+          - name: runtime
+            image: phpdockerio/kong-certbot
+            command: [ "/workdir/certbot-agent.php", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
+            ports:
+            - name: web
+              containerPort: 80
+              protocol: TCP
+            - name: ssl
+              containerPort: 443
+              protocol: TCP
+            env:
+              - name: TERM
+                value: linux
+              - name: KONG_ENDPOINT
+                value: http://base.path.to.kong.admin:8001
+              - name: EMAIL
+                value: letsencrypt@registration.email
+              - name: DOMAINS
+                value: comma.separated,list.of,domains.and.subdomains

@@ -5,8 +5,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: certbot
-  namespace: kong
+  name: kong-certbot-agent
 spec:
   type: NodePort
   ports:
@@ -28,18 +27,16 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kong-certbot
-  namespace: kong
+  name: kong-certbot-agent
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        name: kong-certbot-deployment
-        app: kong-certbot
+        name: kong-certbot-agent
     spec:
       containers:
-      - name: kong
+      - name: runtime
         image: phpdockerio/kong-certbot
         ports:
         - name: web
@@ -51,9 +48,9 @@ spec:
         env:
           - name: TERM
             value: linux
-          - name: KONG_ADMIN_ENDPOINT
+          - name: KONG_ENDPOINT
             value: http://base.path.to.kong.admin:8001
-          - name: LETSENCRYPT_EMAIL
+          - name: EMAIL
             value: letsencrypt@registration.email
-          - name: SUPPORTED_DOMAINS
+          - name: DOMAINS
             value: comma.separated,list.of,domains.and.subdomains
