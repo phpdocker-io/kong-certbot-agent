@@ -1,8 +1,14 @@
 {
-    "name": "kong-certbot",
-    "require": {
-        "php": "^7.0",
-        "guzzlehttp/guzzle": "^6.3",
-        "symfony/var-dumper": "^3.3"
+  "name":     "phpdockerio/kong-certbot",
+  "autoload": {
+    "psr-4": {
+      "PhpDockerIo\\KongCertbot\\": "."
     }
+  },
+  "require":  {
+    "php":                "^7.1",
+    "guzzlehttp/guzzle":  "^6.3",
+    "symfony/var-dumper": "^3.3",
+    "symfony/console":    "^3.3"
+  }
 }
