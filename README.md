@@ -4,7 +4,7 @@ Let's Encrypt integration with Kong
 This repository provides with a cron-based certbot agent that will attempt to acquire Let's Encrypt certificates you control
 for a list of subdomains you provide, and provision Kong with them.
 
-There's an example [kubernetes deployment configuration](kubernetes/certbot.yml) you can use as a guide to deploy wherever you need.
+There's an example [Kubernetes deployment configuration](kubernetes/certbot.yml) you can use as a guide to deploy wherever you need.
 
 **This is a proof of concept!**
 
