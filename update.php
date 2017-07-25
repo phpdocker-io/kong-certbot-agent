@@ -5,20 +5,41 @@ include __DIR__ . '/vendor/autoload.php';
 const CERTS_BASE_PATH = '/etc/letsencrypt/live';
 
 // Config from environment
-$kongAdminUri = $_SERVER['KONG_ADMIN_ENDPOINT'] ?? null;
-$email = $_SERVER['LETSENCRYPT_EMAIL'] ?? null;
-$domains = explode(',', $_SERVER['SUPPORTED_DOMAINS'] ?? '');
+$kongAdminUri = trim($_SERVER['KONG_ADMIN_ENDPOINT'] ?? null);
+$email = trim($_SERVER['LETSENCRYPT_EMAIL'] ?? null);
+$domains = explode(',', trim($_SERVER['SUPPORTED_DOMAINS'] ?? ''));
 
-if (empty($kongAdminUri)) {
-    throw new \InvalidArgumentException('KONG_ADMIN_ENDPOINT environment variable is required');
+$errors = [];
+if ($kongAdminUri === '') {
+    $errors[] = 'KONG_ADMIN_ENDPOINT environment variable is required';
 }
 
-if (empty($email)) {
-    throw new \InvalidArgumentException('LETSENCRYPT_EMAIL environment variable is required');
+if ($email === '') {
+    $errors[] = 'LETSENCRYPT_EMAIL environment variable is required';
 }
 
-if (empty($domains)) {
-    throw new \InvalidArgumentException('SUPPORTED_DOMAINS environment variable is required (comma separated list)');
+if (($domains[0] ?? '') === '') {
+    $errors[] = 'SUPPORTED_DOMAINS environment variable is required (comma separated list)';
+}
+
+if (count($errors) > 0) {
+    $message = "\n
+        ## Certbot kong agent
+
+        Usage:
+
+           export KONG_ADMIN_ENDPOINT=http://foo:8001
+           export LETSENCRYPT_EMAIL=foo@bar.com
+           export SUPPORTED_DOMAINS=foo.com,bar.foo.com
+
+           php update.php
+        
+        Errors: ";
+
+    $message .= implode('; ', $errors);
+
+    echo $message, "\n\n";
+    exit(1);
 }
 
 // Compose cerbot command
