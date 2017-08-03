@@ -6,8 +6,6 @@ for a list of subdomains you provide, and provision Kong with them.
 
 There's an example [Kubernetes deployment configuration](kubernetes/certbot-cron.yml) you can use as a guide to deploy wherever you need.
 
-**This is a proof of concept!**
-
 ## How to
 
 ### Run the container
