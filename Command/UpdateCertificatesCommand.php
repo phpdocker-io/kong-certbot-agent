@@ -133,5 +133,4 @@ class UpdateCertificatesCommand extends Command
 
         return $domains;
     }
-
 }
