@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Handles requesting certificates for a given list of domains off Let's Encrypt via certbot's standalone method - it
  * creates its own HTTP server which you need to ensure it's exposed so that LE's challenges work.
  *
- * Once certificates have been generated, this will update Kong via it's admin API with the certificates for said
+ * Once certificates have been generated, this will update Kong via its admin API with the certificates for said
  * domains.
  *
  * @author PHPDocker.io
