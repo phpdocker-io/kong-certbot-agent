@@ -100,7 +100,7 @@ class UpdateCertificatesCommand extends Command
         foreach ($domains as $domain) {
             $output->writeln(sprintf('Updating certificates config for %s', $domain));
 
-            $basePath = sprintf('%s/%s', CERTS_BASE_PATH, $domain);
+            $basePath = sprintf('%s/%s', self::CERTS_BASE_PATH, $domain);
             $payload  = [
                 'cert' => file_get_contents(sprintf('%s/cert.pem', $basePath)),
                 'key'  => file_get_contents(sprintf('%s/privkey.pem', $basePath)),
