@@ -42,9 +42,6 @@ spec:
         - name: web
           containerPort: 80
           protocol: TCP
-        - name: ssl
-          containerPort: 443
-          protocol: TCP
         env:
           - name: TERM
             value: linux
