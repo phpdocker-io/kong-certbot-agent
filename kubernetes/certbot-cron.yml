@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: runtime
-        image: phpdockerio/kong-certbot
+        image: phpdockerio/kong-certbot-agent:latest
         ports:
         - name: web
           containerPort: 80

@@ -34,12 +34,17 @@ spec:
   jobTemplate:
     spec:
       template:
+
+        # Matches selector on service above
+        metadata:
+          app: kong-certbot
+
         spec:
           concurrencyPolicy: Forbid
           restartPolicy: OnFailure
           containers:
           - name: runtime
-            image: phpdockerio/kong-certbot
+            image: phpdockerio/kong-certbot-agent:latest
             command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
             ports:
             - name: web
