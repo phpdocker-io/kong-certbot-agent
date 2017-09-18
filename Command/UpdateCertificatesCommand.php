@@ -60,9 +60,11 @@ class UpdateCertificatesCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
+     * @return int
+     *
      * @throws InvalidArgumentException
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $email        = $input->getArgument('email');
         $kongAdminUri = $input->getArgument('kong-endpoint');
@@ -84,7 +86,7 @@ class UpdateCertificatesCommand extends Command
         if ($cmdStatus !== 0) {
             $output->writeln('Error when executing certbot');
             $output->write($cmdOutput);
-            exit($cmdStatus);
+            return $cmdStatus;
         }
 
         // Update kong admin with the new certificates foreach domain
@@ -121,6 +123,8 @@ class UpdateCertificatesCommand extends Command
         }
 
         $output->writeln(sprintf('%s certificates correctly sent to Kong', count($domains)));
+
+        return 0;
     }
 
     /**
