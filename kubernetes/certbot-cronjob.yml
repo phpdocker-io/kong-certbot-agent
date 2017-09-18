@@ -31,6 +31,7 @@ metadata:
 spec:
   # Run job at 01:07 every 30 days
   schedule: "7 1 */30 * * "
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
@@ -40,7 +41,6 @@ spec:
           app: kong-certbot
 
         spec:
-          concurrencyPolicy: Forbid
           restartPolicy: OnFailure
           containers:
           - name: runtime
