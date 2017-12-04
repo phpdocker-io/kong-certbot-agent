@@ -35,11 +35,10 @@ spec:
   jobTemplate:
     spec:
       template:
-
         # Matches selector on service above
         metadata:
-          app: kong-certbot
-
+          labels:
+            app: kong-certbot
         spec:
           restartPolicy: OnFailure
           containers:
