@@ -6,7 +6,7 @@ kind: Service
 metadata:
   name: kong-certbot-agent
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: certbot
     port: 80
