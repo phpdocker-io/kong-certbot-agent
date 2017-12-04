@@ -33,7 +33,7 @@ spec:
   template:
     metadata:
       labels:
-        name: kong-certbot-agent
+        app: kong-certbot
     spec:
       containers:
       - name: runtime
