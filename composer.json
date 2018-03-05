@@ -8,7 +8,7 @@
   "require":  {
     "php":                "^7.1",
     "guzzlehttp/guzzle":  "^6.3",
-    "symfony/var-dumper": "^3.3",
-    "symfony/console":    "^3.3"
+    "symfony/var-dumper": "^4.0",
+    "symfony/console":    "^4.0"
   }
 }
