@@ -71,14 +71,14 @@ it, as it's done on the [kubernetes cronjob example](kubernetes/certbot-cronjob.
 
 ```bash
 # Get a certificate for three subdomains, and submit to kong
-docker run -it --rm phpdockerio/kong-certbot \
+docker run -it --rm phpdockerio/kong-certbot-agent \
     ./certbot-agent certs:update \
     http://kong-admin:8001 \
     foo@bar.com \
     bar.com,foo.bar.com,www.bar.com
 
 # Get a TEST certificate for three subdomains, and submit to kong
-docker run -it --rm phpdockerio/kong-certbot \
+docker run -it --rm phpdockerio/kong-certbot-agent \
     ./certbot-agent certs:update -t \
     http://kong-admin:8001 \
     foo@bar.com \
