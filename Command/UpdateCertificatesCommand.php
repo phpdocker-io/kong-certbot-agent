@@ -115,7 +115,7 @@ class UpdateCertificatesCommand extends Command
                 'form_params' => [
                     'cert' => file_get_contents(sprintf('%s/fullchain.pem', $basePath)),
                     'key'  => file_get_contents(sprintf('%s/privkey.pem', $basePath)),
-                    'snis' => $domain,
+                    'snis' => [$domain],
                 ],
             ];
 
