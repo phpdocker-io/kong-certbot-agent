@@ -95,12 +95,13 @@ class UpdateCertificatesCommand extends Command
             return $cmdStatus;
         }
 
-        // Update kong admin with the new certificates foreach domain
-        $guzzle = new \GuzzleHttp\Client();
-
         // if kong api key is here,then add header
         if ($kongApikey) {
-          $guzzle->setDefaultOption('headers/apiKey', $kongApikey);
+          // Update kong admin with the new certificates foreach domain
+          $guzzle = new \GuzzleHttp\Client(['headers' => ['apikey' => $kongApikey]]);
+        } else {
+          // Update kong admin with the new certificates foreach domain
+          $guzzle = new \GuzzleHttp\Client();
         }
 
         foreach ($domains as $domain) {
