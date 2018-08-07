@@ -48,6 +48,11 @@ class UpdateCertificatesCommand extends Command
                 InputArgument::REQUIRED,
                 'Comma separated list of domains to request certs for; eg: bar.com,foo.bar.com'
             )
+            ->addArgument(
+               'kong-apikey',
+               InputArgument::OPTIONAL,
+               'Kong Admin API key, eg: curl -X GET -H "apikey:xxxx"'
+            )
             ->addOption(
                 'test-cert',
                 't',
@@ -70,6 +75,7 @@ class UpdateCertificatesCommand extends Command
         $kongAdminUri = $input->getArgument('kong-endpoint');
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
+        $kongApikey   = $input->getArgument('kong-apikey');
 
         // Compose cerbot command & execute
         $renewCmd = escapeshellcmd(sprintf(
@@ -89,8 +95,14 @@ class UpdateCertificatesCommand extends Command
             return $cmdStatus;
         }
 
-        // Update kong admin with the new certificates foreach domain
-        $guzzle = new \GuzzleHttp\Client();
+        // if kong api key is here,then add header
+        if ($kongApikey) {
+          // Update kong admin with the new certificates foreach domain
+          $guzzle = new \GuzzleHttp\Client(['headers' => ['apikey' => $kongApikey]]);
+        } else {
+          // Update kong admin with the new certificates foreach domain
+          $guzzle = new \GuzzleHttp\Client();
+        }
 
         foreach ($domains as $domain) {
             $output->writeln(sprintf('Updating certificates config for %s', $domain));
@@ -103,7 +115,7 @@ class UpdateCertificatesCommand extends Command
                 'form_params' => [
                     'cert' => file_get_contents(sprintf('%s/fullchain.pem', $basePath)),
                     'key'  => file_get_contents(sprintf('%s/privkey.pem', $basePath)),
-                    'snis' => $domain,
+                    'snis' => [$domain],
                 ],
             ];
 

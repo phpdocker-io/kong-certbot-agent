@@ -24,8 +24,8 @@ spec:
 # Make sure you edit your config below at the environment vars
 # Take note of the namespace below, and change as needed
 
-apiVersion: batch/v2alpha1
-kind: ScheduledJob
+apiVersion: batch/v1beta1
+kind: CronJob
 metadata:
   name: kong-certbot-agent
 spec:
@@ -43,8 +43,8 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: runtime
-            image: phpdockerio/kong-certbot-agent:latest
-            command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
+            image: xds2000/kong-certbot-agent:latest
+            command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)", "$(APIKEY)" ]
             ports:
             - name: web
               containerPort: 80
@@ -53,8 +53,10 @@ spec:
               - name: TERM
                 value: linux
               - name: KONG_ENDPOINT
-                value: http://base.path.to.kong.admin:8001
+                value: http://localhost:8001
               - name: EMAIL
-                value: letsencrypt@registration.email
+                value: yourname@yourdomain
               - name: DOMAINS
-                value: comma.separated,list.of,domains.and.subdomains
+                value: yourdomain.com,api.yourdomain.com
+              - name: APIKEY
+                value: <your apikey from kong apikey plugin>
