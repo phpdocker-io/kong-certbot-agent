@@ -53,10 +53,10 @@ spec:
               - name: TERM
                 value: linux
               - name: KONG_ENDPOINT
-                value: http://47.52.127.242:8001
+                value: http://localhost:8001
               - name: EMAIL
-                value: xiaodeshi@bitmore.pro
+                value: yourname@yourdomain
               - name: DOMAINS
-                value: api.bitbook.one
+                value: yourdomain.com,api.yourdomain.com
               - name: APIKEY
-                value: LVatXDbChb2dIHcbRpYbWZDbhsl9rz2o
+                value: <your apikey from kong apikey plugin>

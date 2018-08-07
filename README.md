@@ -1,3 +1,14 @@
+# Enhance for me (Xiao Deshi)
+1. Support Kong Apikey plugin feature, support apikey header for request kong api
+2. sni parameter support array, not string, fix it2. sni parameter support
+   array, not string, fix it
+3. first time, you can create job to create new cert firstly. see eg. below:
+```
+kubectl create job --from=cronjob/kong-certbot-agent cert-renew
+
+```
+
+
 # Kong Certbot agent
 Let's Encrypt integration with Kong
 
@@ -16,13 +27,13 @@ There's an example [Kubernetes deployment configuration](kubernetes/certbot-cron
   - Deploy container in your environment.
   - It will automagically run the updater script every 24th of the month.
   - Profit!
-  
+
 ### Kong configuration
 
-In order for the challenge to work correctly, you need to open an API in Kong pointing to the container at a very 
-specific URL path. It MUST respond on every domain you're requesting certs for. 
+In order for the challenge to work correctly, you need to open an API in Kong pointing to the container at a very
+specific URL path. It MUST respond on every domain you're requesting certs for.
 
-When it comes the time to run certbot, it will open an HTTP server, put some stuff on a specific path, then ping 
+When it comes the time to run certbot, it will open an HTTP server, put some stuff on a specific path, then ping
 Let's Encrypt, which will attempt to read that from the domain requested. If successful, a certificate is generated.
 
 This is an API definition example in Kong admin:
@@ -56,12 +67,12 @@ This assumes that `http://kong-certbot-agent` is correctly pointing to the agent
 ## Kubernetes
 
 Head off to the [Kubernetes deployment configuration](kubernetes) for examples, using a Kubernetes service
-plus either a [deployment](kubernetes/certbot-cron.yml), or a [kubernetes cronjob](kubernetes/certbot-cronjob.yml). 
+plus either a [deployment](kubernetes/certbot-cron.yml), or a [kubernetes cronjob](kubernetes/certbot-cronjob.yml).
 
-Cronjobs (formerly `scheduledjob`) are a relatively new thing in Kubernetes and won't be available unless you're on 
+Cronjobs (formerly `scheduledjob`) are a relatively new thing in Kubernetes and won't be available unless you're on
 Kubernetes 1.4+.
 
-Note: your k8s service will always time out since there's nothing listening on HTTP except for when certbot itself is 
+Note: your k8s service will always time out since there's nothing listening on HTTP except for when certbot itself is
 running and requesting certs from LE.
 
 ## Command line tool
