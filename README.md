@@ -6,6 +6,11 @@ for a list of subdomains you provide, and provision Kong with them.
 
 There's an example [Kubernetes deployment configuration](kubernetes/certbot-cron.yml) you can use as a guide to deploy wherever you need.
 
+## Compatibility
+
+  * Kong >= 0.14: use Kong Certbot Agent 2.x.
+  * Kong <= 0.13: use Kong Certbot Agent 1.x.
+
 ## How to
 
 ### Run the container
