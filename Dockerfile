@@ -1,4 +1,4 @@
-FROM phpdockerio/php71-cli
+FROM phpdockerio/php72-cli
 MAINTAINER http://phpdocker.io
 
 WORKDIR /workdir
@@ -13,8 +13,8 @@ ENV EMAIL=foo@bar.com
 # Comma separated list of domains to acquire certs for
 ENV DOMAINS=foo.com,www.foo.com,bar.foo.com
 
-# Install certbot and cron
-RUN  echo "deb http://ppa.launchpad.net/certbot/certbot/ubuntu xenial main" > /etc/apt/sources.list.d/letsencrypt.list \
+# Install certbot from PPA instead of ubuntu's repos to ensure we always got the latest
+RUN  echo "deb http://ppa.launchpad.net/certbot/certbot/ubuntu bionic main" > /etc/apt/sources.list.d/letsencrypt.list \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7BF576066ADA65728FC7E70A8C47BE8E75BCA694 \
     && apt-get update \
     && apt-get -y --no-install-recommends install nano cron certbot \
