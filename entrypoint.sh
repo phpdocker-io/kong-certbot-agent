@@ -6,4 +6,4 @@ printenv > /etc/docker-env
 # Run cron & tail logs
 cron
 touch /var/log/cert-update.log
-tailf /var/log/cert-update.log
+tail -f /var/log/cert-update.log
