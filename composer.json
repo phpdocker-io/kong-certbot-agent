@@ -2,13 +2,17 @@
   "name":     "phpdockerio/kong-certbot",
   "autoload": {
     "psr-4": {
-      "PhpDockerIo\\KongCertbot\\": "."
+      "PhpDockerIo\\KongCertbot\\": "src/"
     }
   },
+  "license": "MIT",
   "require":  {
     "php":                "^7.1",
     "guzzlehttp/guzzle":  "^6.3",
     "symfony/var-dumper": "^4.0",
     "symfony/console":    "^4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.3"
   }
 }
