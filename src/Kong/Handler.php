@@ -86,4 +86,12 @@ class Handler
 
         return !(\count($this->errors) > 0);
     }
+
+    /**
+     * @return ClientException[]|GuzzleException[]
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
 }
