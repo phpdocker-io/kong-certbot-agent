@@ -22,7 +22,7 @@ RUN  echo "deb http://ppa.launchpad.net/certbot/certbot/ubuntu bionic main" > /e
 
 # Composer config - add early to benefit from docker build caches
 COPY composer.* /workdir/
-RUN composer -o install
+RUN composer -o install --no-dev
 
 # App and crontab
 COPY . /workdir/
