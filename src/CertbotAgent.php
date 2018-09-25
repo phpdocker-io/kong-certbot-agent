@@ -33,7 +33,17 @@ class CertbotAgent
         $this->certbot = $certbot;
     }
 
-    public function execute(string $email, array $domains, bool $testCert): bool
+    /**
+     * Reaches out to Let's Encrypt for certificates for the given list of $domains belonging to $email and stores
+     * them into Kong.
+     *
+     * @param array  $domains  List of domains to acquire certs for
+     * @param string $email    Email these domains belong to at Let's Encrypt
+     * @param bool   $testCert Whether to acquire test certificates instead of the real deal
+     *
+     * @return bool
+     */
+    public function execute(array $domains, string $email, bool $testCert): bool
     {
         $this->kong->store($this->certbot->acquireCertificates($domains, $email, $testCert));
 
