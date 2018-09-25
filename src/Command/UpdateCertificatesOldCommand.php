@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author PHPDocker.io
  */
-class UpdateCertificatesCommand extends Command
+class UpdateCertificatesOldCommand extends Command
 {
     const CERTS_BASE_PATH = '/etc/letsencrypt/live';
 
