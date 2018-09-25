@@ -2,7 +2,10 @@
 
 namespace PhpDockerIo\KongCertbot\Command;
 
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Client as Guzzle;
+use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
+use PhpDockerIo\KongCertbot\CertbotAgent;
+use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -69,60 +72,11 @@ class UpdateCertificatesCommand extends Command
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
 
-        // Compose cerbot command & execute
-        $renewCmd = escapeshellcmd(sprintf(
-            'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
-            $testCert ? '--test-cert' : '',
-            $email,
-            '-d ' . implode(' -d ', $domains)
-        ));
+        // Spawn CertbotAgent and its dependencies
+        $kong  = new Kong($kongAdminUri, new Guzzle(), $output);
+        $agent = new CertbotAgent($kong, new Certbot(), $output);
 
-        $cmdStatus = null;
-        $cmdOutput = [];
-        exec($renewCmd, $cmdOutput, $cmdStatus);
-
-        if ($cmdStatus !== 0) {
-            $output->writeln('Error when executing certbot');
-            $output->write($cmdOutput);
-            return $cmdStatus;
-        }
-
-        // Update kong admin with the new certificates foreach domain
-        $guzzle = new \GuzzleHttp\Client();
-
-        foreach ($domains as $domain) {
-            $output->writeln(sprintf('Updating certificates config for %s', $domain));
-
-            $basePath = sprintf('%s/%s', self::CERTS_BASE_PATH, $domain);
-            $payload  = [
-                'headers'     => [
-                    'accept' => 'application/json',
-                ],
-                'form_params' => [
-                    'cert'   => file_get_contents(sprintf('%s/fullchain.pem', $basePath)),
-                    'key'    => file_get_contents(sprintf('%s/privkey.pem', $basePath)),
-                    'snis[]' => $domain,
-                ],
-            ];
-
-            // Unfortunately for us, PUT is not UPSERT
-            try {
-                $guzzle->post(sprintf('%s/certificates', $kongAdminUri), $payload);
-            } catch (ClientException $ex) {
-                if ($ex->getCode() !== 409) {
-                    throw $ex;
-                }
-
-                unset($payload['form_params']['snis']);
-                $guzzle->patch(sprintf('%s/certificates/%s', $kongAdminUri, $domain), $payload);
-            }
-
-            $output->writeln(sprintf('Certificate for domain %s correctly sent to Kong', $domain));
-        }
-
-        $output->writeln(sprintf('%s certificates correctly sent to Kong', count($domains)));
-
-        return 0;
+        return (int) $agent->execute($domains, $email, $testCert);
     }
 
     /**

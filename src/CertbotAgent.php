@@ -3,6 +3,8 @@
 namespace PhpDockerIo\KongCertbot;
 
 use GuzzleHttp\Exception\ClientException;
+use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
+use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -13,12 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CertbotAgent
 {
     /**
-     * @var Kong\Handler
+     * @var Kong
      */
     private $kong;
 
     /**
-     * @var Certbot\Handler
+     * @var Certbot
      */
     private $certbot;
 
@@ -27,7 +29,7 @@ class CertbotAgent
      */
     private $output;
 
-    public function __construct(Kong\Handler $kong, Certbot\Handler $certbot, OutputInterface $output)
+    public function __construct(Kong $kong, Certbot $certbot, OutputInterface $output)
     {
         $this->kong    = $kong;
         $this->certbot = $certbot;
