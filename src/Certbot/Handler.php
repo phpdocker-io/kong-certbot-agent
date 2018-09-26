@@ -36,17 +36,17 @@ class Handler
         $certificates  = [];
 
         foreach ($sortedDomains as $rootDomain => $effectiveDomains) {
-            $renewCmd = escapeshellcmd(sprintf(
+            $renewCmd = \sprintf(
                 'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
                 $testCert ? '--test-cert' : '',
                 $email,
                 '-d ' . implode(' -d ', $effectiveDomains)
-            ));
+            );
 
             $cmdStatus = 1;
             $cmdOutput = [];
 
-            \exec($renewCmd, $cmdOutput, $cmdStatus);
+            \exec(\escapeshellcmd($renewCmd), $cmdOutput, $cmdStatus);
 
             if ($cmdStatus !== 0) {
                 $this->errors[] = new Error($cmdOutput, $cmdStatus, $effectiveDomains);
@@ -55,8 +55,8 @@ class Handler
             $basePath = sprintf('%s/%s', self::CERTS_BASE_PATH, $rootDomain);
 
             $certificates[] = new Certificate(
-                file_get_contents(sprintf('%s/fullchain.pem', $basePath)),
-                file_get_contents(sprintf('%s/privkey.pem', $basePath)),
+                \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),
+                \file_get_contents(\sprintf('%s/privkey.pem', $basePath)),
                 $effectiveDomains
             );
         }
