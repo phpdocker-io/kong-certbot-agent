@@ -2,7 +2,7 @@
 
 namespace PhpDockerIo\KongCertbot\Command;
 
-use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\ClientInterface as Guzzle;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\CertbotAgent;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
@@ -24,6 +24,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UpdateCertificatesCommand extends Command
 {
+    /**
+     * @var Guzzle
+     */
+    private $guzzle;
+
+    public function __construct(Guzzle $guzzle)
+    {
+        parent::__construct(null);
+
+        $this->guzzle = $guzzle;
+    }
     /**
      * Set the arguments and options required for the command line tool.
      *
@@ -72,11 +83,11 @@ class UpdateCertificatesCommand extends Command
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
 
-        // Spawn CertbotAgent and its dependencies
-        $kong  = new Kong($kongAdminUri, new Guzzle(), $output);
-        $agent = new CertbotAgent($kong, new Certbot(), $output);
-
-        return (int) $agent->execute($domains, $email, $testCert);
+        return (int) (new CertbotAgent(
+            new Kong($kongAdminUri, $this->guzzle, $output),
+            new Certbot(),
+            $output
+        ))->execute($domains, $email, $testCert);
     }
 
     /**
