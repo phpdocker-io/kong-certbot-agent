@@ -72,7 +72,7 @@ class UpdateCertificatesOldCommand extends Command
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
 
-        // Compose cerbot command & execute
+        // Compose certbot command & execute
         $renewCmd = escapeshellcmd(sprintf(
             'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
             $testCert ? '--test-cert' : '',

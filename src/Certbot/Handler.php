@@ -43,13 +43,13 @@ class Handler
                 '-d ' . implode(' -d ', $effectiveDomains)
             ));
 
-            $cmdStatus = null;
+            $cmdStatus = 1;
             $cmdOutput = [];
 
             \exec($renewCmd, $cmdOutput, $cmdStatus);
 
             if ($cmdStatus !== 0) {
-                $this->errors[] = Error($cmdOutput, $cmdStatus, $effectiveDomains);
+                $this->errors[] = new Error($cmdOutput, $cmdStatus, $effectiveDomains);
             }
 
             $basePath = sprintf('%s/%s', self::CERTS_BASE_PATH, $rootDomain);

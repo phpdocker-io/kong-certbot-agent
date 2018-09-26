@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PhpDockerIo\KongCertbot;
 
 use GuzzleHttp\Exception\ClientException;
+use PhpDockerIo\KongCertbot\Certbot\Error;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -62,7 +63,7 @@ class CertbotAgent
      * @todo
      *
      * @param ClientException[] $kongErrors
-     * @param Certbot\Error[]   $certbotErrors
+     * @param Error[]   $certbotErrors
      */
     public function reportErrors(array $kongErrors, array $certbotErrors): void
     {
