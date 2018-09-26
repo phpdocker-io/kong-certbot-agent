@@ -41,6 +41,13 @@ class Handler
         $this->output       = $output;
     }
 
+    /**
+     * Stores the given list of certificates grouped by root
+     *
+     * @param array $certificates
+     *
+     * @return bool
+     */
     public function store(array $certificates): bool
     {
         foreach ($certificates as $certificate) {
@@ -68,12 +75,17 @@ class Handler
                     continue;
                 }
 
+                // Remove SNIs from PATCH as we will be patching into each PATCH individually
                 unset($payload['form_params']['snis']);
 
+                // @todo: use asynchronous here
                 foreach ($certificate->getDomains() as $domain) {
                     try {
-                        $this->guzzle->request('patch', \sprintf('%s/certificates/%s', $kongAdminUri, $domain),
-                            $payload);
+                        $this->guzzle->request(
+                            'patch',
+                            \sprintf('%s/certificates/%s', $this->kongAdminUri, $domain),
+                            $payload
+                        );
                     } catch (ClientException|GuzzleException $patchException) {
                         $this->errors[] = $ex;
                         continue;
