@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace PhpDockerIo\KongCertbot\Command;
 
 use GuzzleHttp\ClientInterface as Guzzle;
+use GuzzleHttp\Exception\ClientException;
+use PhpDockerIo\KongCertbot\Certbot\Error;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
-use PhpDockerIo\KongCertbot\CertbotAgent;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -79,16 +80,33 @@ class UpdateCertificatesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Parse input
         $email        = $input->getArgument('email');
         $kongAdminUri = $input->getArgument('kong-endpoint');
         $domains      = $this->parseDomains($input->getArgument('domains'));
         $testCert     = $input->getOption('test-cert');
 
-        return (int) (new CertbotAgent(
-            new Kong($kongAdminUri, $this->guzzle, $output),
-            new Certbot(),
-            $output
-        ))->execute($domains, $email, $testCert);
+        $this->validateInput($email, $kongAdminUri, $domains, $testCert);
+
+        // Spawn kong and certbot handlers with config and dependencies
+        $kong    = new Kong($kongAdminUri, $this->guzzle, $output);
+        $certbot = new Certbot();
+
+        // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
+        // and we defer error handling until they're stored
+        $certificates = $certbot->acquireCertificates($domains, $email, $testCert);
+
+        // Store certs into kong via the admin UI. Again, not all-or-nothing
+        $kong->store($certificates);
+
+        // Capture errors for reporting - some certs might have succeeded, but we do need to
+        // exit appropriately for whatever orchestrator to realise there were problems
+        if (\count($kong->getErrors()) > 0 || \count($certbot->getErrors()) > 0) {
+            $this->reportErrors($kong->getErrors(), $certbot->getErrors(), $output);
+            return 1;
+        }
+
+        return 0;
     }
 
     /**
@@ -102,12 +120,36 @@ class UpdateCertificatesCommand extends Command
     private function parseDomains(string $domainsRaw): array
     {
         $domains = [];
-        foreach (explode(',', $domainsRaw) as $domain) {
+        foreach (\explode(',', $domainsRaw) as $domain) {
             if (empty($domain) === false) {
                 $domains[] = $domain;
             }
         }
 
         return $domains;
+    }
+
+    /**
+     * @todo
+     *
+     * @param ClientException[] $kongErrors
+     * @param Error[]           $certbotErrors
+     * @param OutputInterface   $output
+     */
+    private function reportErrors(array $kongErrors, array $certbotErrors, OutputInterface $output): void
+    {
+        $output->writeln('oops');
+    }
+
+    /**
+     * @todo
+     *
+     * @param string $email
+     * @param string $kongAdminUri
+     * @param array  $domains
+     * @param bool   $testCert
+     */
+    private function validateInput(string $email, string $kongAdminUri, array $domains, bool $testCert): void
+    {
     }
 }
