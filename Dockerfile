@@ -31,5 +31,7 @@ RUN ln -s /workdir/crontab /var/spool/cron/crontabs/root
 # Expose HTTP/HTTPS ports for certbot standalone
 EXPOSE 80 443
 
+VOLUME /var/log/kong-certbot-agent
+
 # Run entrypoint
 CMD ["./entrypoint.sh"]
