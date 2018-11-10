@@ -111,7 +111,11 @@ class UpdateCertificatesCommand extends Command
             try {
                 $guzzle->post(sprintf('%s/certificates', $kongAdminUri), $payload);
             } catch (ClientException $ex) {
-                if ($ex->getCode() !== 409) {
+                if ($ex->getCode() !== 409 && $ex->getCode() !== 400) {
+                    throw $ex;
+                }
+                $responseBody = $ex->getResponse()->getBody();
+                if ($ex->getCode() !== 409 && strpos($responseBody, 'already associated with existing') === false) {
                     throw $ex;
                 }
 
