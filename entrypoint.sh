@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Dump environment on to file so that we can load it up on the crontab
-printenv > /etc/docker-env
+echo "waiting before first attempt..."
+sleep 60
 
-# Run cron & tail logs
-cron
-touch /var/log/cert-update.log
-tail -f /var/log/cert-update.log
+while true; do
+    for domain in ${DOMAINS//,/ } ; do
+        echo "starting domain $domain ($(date))..."
+        /workdir/certbot-agent certs:update $KONG_ENDPOINT $EMAIL $domain 2>&1 \
+            | tee /var/log/kong-certbot-agent/cert-update_$domain.log
+    done
+    echo "waiting before next attempt..."
+    sleep 86400
+done

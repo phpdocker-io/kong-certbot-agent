@@ -3,6 +3,8 @@ MAINTAINER http://phpdocker.io
 
 WORKDIR /workdir
 
+VOLUME /etc/letsencrypt
+
 # The following environment variables are for you to set when you run the container
 # Endpoint to Kong admin
 ENV KONG_ENDPOINT=http://foo:8001
