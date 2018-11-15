@@ -111,7 +111,7 @@ class UpdateCertificatesCommand extends Command
             try {
                 $guzzle->post(sprintf('%s/certificates', $kongAdminUri), $payload);
             } catch (ClientException $ex) {
-                if ($ex->getCode() !== 409) {
+                if (!in_array($ex->getCode(), [400, 409])) {
                     throw $ex;
                 }
 
