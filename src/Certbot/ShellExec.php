@@ -7,6 +7,7 @@ namespace PhpDockerIo\KongCertbot\Certbot;
  * Runs a command on the shell.
  *
  * @package PhpDockerIo\KongCertbot\Certbot
+ * @codeCoverageIgnore
  */
 class ShellExec
 {

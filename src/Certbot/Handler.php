@@ -46,11 +46,9 @@ class Handler
      *
      * @return Certificate[]
      */
-    public function acquireCertificates(array $domains, string $email, bool $testCert): array
+    public function acquireCertificate(array $domains, string $email, bool $testCert): Certificate
     {
         // Domains are stored by certbot in a folder named after the first domain on the list
-        $certificates = [];
-
         $firstDomain = \reset($domains);
 
         if ($firstDomain === false) {
@@ -65,22 +63,19 @@ class Handler
         );
 
         $cmdStatus = $this->shellExec->exec($renewCmd);
-        $cmdOutput = $this->shellExec->getOutput();
 
         if ($cmdStatus === false) {
-            $this->errors[] = new Error($cmdOutput, 1, $domains);
-            return $certificates;
+            $this->errors[] = new Error( $this->shellExec->getOutput(), 1, $domains);
+            throw new \RuntimeException('Certbot execution failed');
         }
 
         $basePath = sprintf('%s/%s', $this->certsBasePath, $firstDomain);
 
-        $certificates[] = new Certificate(
+        return new Certificate(
             \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),
             \file_get_contents(\sprintf('%s/privkey.pem', $basePath)),
             $domains
         );
-
-        return $certificates;
     }
 
     /**
