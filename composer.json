@@ -2,7 +2,8 @@
   "name": "phpdockerio/kong-certbot",
   "autoload": {
     "psr-4": {
-      "PhpDockerIo\\KongCertbot\\": "src/"
+      "PhpDockerIo\\KongCertbot\\": "src/",
+      "Tests\\PhpDockerIo\\KongCertbot\\": "tests/"
     }
   },
   "license": "MIT",
