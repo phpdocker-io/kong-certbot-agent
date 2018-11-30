@@ -48,48 +48,39 @@ class Handler
      */
     public function acquireCertificates(array $domains, string $email, bool $testCert): array
     {
-        $sortedDomains = $this->sortDomainsByRootDomain($domains);
-        $certificates  = [];
+        // Domains are stored by certbot in a folder named after the first domain on the list
+        $certificates = [];
 
-        foreach ($sortedDomains as $rootDomain => $effectiveDomains) {
-            $renewCmd = \sprintf(
-                'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
-                $testCert ? '--test-cert' : '',
-                $email,
-                '-d ' . implode(' -d ', $effectiveDomains)
-            );
+        $firstDomain = \reset($domains);
 
-            $cmdStatus = $this->shellExec->exec($renewCmd);
-            $cmdOutput = $this->shellExec->getOutput();
-
-            if ($cmdStatus !== 0) {
-                $this->errors[] = new Error($cmdOutput, 1, $effectiveDomains);
-            }
-
-            $basePath = sprintf('%s/%s', $this->certsBasePath, $rootDomain);
-
-            $certificates[] = new Certificate(
-                \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),
-                \file_get_contents(\sprintf('%s/privkey.pem', $basePath)),
-                $effectiveDomains
-            );
+        if ($firstDomain === false) {
+            throw new \InvalidArgumentException('Empty list of domains provided');
         }
 
-        return $certificates;
-    }
+        $renewCmd = \sprintf(
+            'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
+            $testCert ? '--test-cert' : '',
+            $email,
+            '-d ' . implode(' -d ', $domains)
+        );
 
-    /**
-     * Given a list of domains, determine their root domain and return as a list indexed by root domains.
-     *
-     * @todo
-     *
-     * @param array $domains
-     *
-     * @return array
-     */
-    private function sortDomainsByRootDomain(array $domains): array
-    {
-        return [];
+        $cmdStatus = $this->shellExec->exec($renewCmd);
+        $cmdOutput = $this->shellExec->getOutput();
+
+        if ($cmdStatus === false) {
+            $this->errors[] = new Error($cmdOutput, 1, $domains);
+            return $certificates;
+        }
+
+        $basePath = sprintf('%s/%s', $this->certsBasePath, $firstDomain);
+
+        $certificates[] = new Certificate(
+            \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),
+            \file_get_contents(\sprintf('%s/privkey.pem', $basePath)),
+            $domains
+        );
+
+        return $certificates;
     }
 
     /**
