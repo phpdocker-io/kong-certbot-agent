@@ -4,6 +4,7 @@ MAINTAINER http://phpdocker.io
 WORKDIR /workdir
 
 VOLUME /etc/letsencrypt
+VOLUME /var/log/kong-certbot-agent
 
 # The following environment variables are for you to set when you run the container
 # Endpoint to Kong admin
