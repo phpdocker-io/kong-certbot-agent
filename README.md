@@ -18,6 +18,7 @@ There's an example [Kubernetes deployment configuration](kubernetes/certbot-cron
     - KONG_ENDPOINT: this will be the http endpoint your kong admin is at, without its path. ie `http://kong:8001`
     - EMAIL: this is the email address linked to your let's encrypt certificates.
     - DOMAINS: this is a comma-separated list of domains we'll be asking certificates for.
+  - make volume `/etc/letsencrypt` persistent (stored letsencrypt renewal data).
   - Deploy container in your environment.
   - It will automagically run the updater script every 24 hours and update each domain that is due for renewal.
   - Profit!
