@@ -21,7 +21,7 @@ There's an example [Kubernetes deployment configuration](kubernetes/certbot-cron
   - make volume `/etc/letsencrypt` persistent (stored letsencrypt renewal data).
   - (optionally) make volume `/var/log/kong-certbot-agent` persistent (stored log output).
   - Deploy container in your environment.
-  - It will automagically run the updater script every 24th of the month.
+  - It will automagically run the updater script every 24 hours and update each domain that is due for renewal.
   - Profit!
   
 ### Kong configuration
