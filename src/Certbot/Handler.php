@@ -12,12 +12,28 @@ use PhpDockerIo\KongCertbot\Certificate;
  */
 class Handler
 {
-    private const CERTS_BASE_PATH = '/etc/letsencrypt/live';
+    private const DEFAULT_CERTS_BASE_PATH = '/etc/letsencrypt/live';
 
     /**
      * @var Error[]
      */
     private $errors = [];
+
+    /**
+     * @var ShellExec
+     */
+    private $shellExec;
+
+    /**
+     * @var string
+     */
+    private $certsBasePath;
+
+    public function __construct(ShellExec $shellExec, string $certsBasePath = null)
+    {
+        $this->shellExec     = $shellExec;
+        $this->certsBasePath = $certsBasePath ?? self::DEFAULT_CERTS_BASE_PATH;
+    }
 
     /**
      * Separate all domains by root domain, acquire certificates grouped per root domain and return.
@@ -43,16 +59,14 @@ class Handler
                 '-d ' . implode(' -d ', $effectiveDomains)
             );
 
-            $cmdStatus = 1;
-            $cmdOutput = [];
-
-            \exec(\escapeshellcmd($renewCmd), $cmdOutput, $cmdStatus);
+            $cmdStatus = $this->shellExec->exec($renewCmd);
+            $cmdOutput = $this->shellExec->getOutput();
 
             if ($cmdStatus !== 0) {
-                $this->errors[] = new Error($cmdOutput, $cmdStatus, $effectiveDomains);
+                $this->errors[] = new Error($cmdOutput, 1, $effectiveDomains);
             }
 
-            $basePath = sprintf('%s/%s', self::CERTS_BASE_PATH, $rootDomain);
+            $basePath = sprintf('%s/%s', $this->certsBasePath, $rootDomain);
 
             $certificates[] = new Certificate(
                 \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),

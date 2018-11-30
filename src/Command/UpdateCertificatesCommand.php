@@ -7,6 +7,7 @@ use GuzzleHttp\ClientInterface as Guzzle;
 use GuzzleHttp\Exception\ClientException;
 use PhpDockerIo\KongCertbot\Certbot\Error;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
+use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -31,11 +32,17 @@ class UpdateCertificatesCommand extends Command
      */
     private $guzzle;
 
-    public function __construct(Guzzle $guzzle)
+    /**
+     * @var ShellExec
+     */
+    private $shellExec;
+
+    public function __construct(Guzzle $guzzle, ShellExec $shellExec)
     {
         parent::__construct(null);
 
-        $this->guzzle = $guzzle;
+        $this->guzzle    = $guzzle;
+        $this->shellExec = $shellExec;
     }
     /**
      * Set the arguments and options required for the command line tool.
@@ -90,7 +97,7 @@ class UpdateCertificatesCommand extends Command
 
         // Spawn kong and certbot handlers with config and dependencies
         $kong    = new Kong($kongAdminUri, $this->guzzle, $output);
-        $certbot = new Certbot();
+        $certbot = new Certbot($this->shellExec);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
