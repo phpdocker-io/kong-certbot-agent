@@ -101,7 +101,7 @@ class UpdateCertificatesCommand extends Command
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
-        $certificates = $certbot->acquireCertificates($domains, $email, $testCert);
+        $certificates = $certbot->acquireCertificate($domains, $email, $testCert);
 
         // Store certs into kong via the admin UI. Again, not all-or-nothing
         $kong->store($certificates);
