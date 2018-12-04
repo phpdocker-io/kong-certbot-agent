@@ -44,7 +44,7 @@ class Handler
      * @param string   $email
      * @param bool     $testCert
      *
-     * @return Certificate[]
+     * @return Certificate
      */
     public function acquireCertificate(array $domains, string $email, bool $testCert): Certificate
     {

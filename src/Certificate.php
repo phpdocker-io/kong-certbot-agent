@@ -23,11 +23,11 @@ class Certificate
      */
     private $domains;
 
-    public function __construct(string $cert, string $key, array $domain)
+    public function __construct(string $cert, string $key, array $domains)
     {
         $this->cert    = $cert;
         $this->key     = $key;
-        $this->domains = $domain;
+        $this->domains = $domains;
     }
 
     /**
