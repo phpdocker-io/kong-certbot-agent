@@ -79,7 +79,7 @@ class Handler
                 return false;
             }
 
-            // Remove SNIs from PATCH as we will be patching into each PATCH individually
+            // Remove SNIs from PATCH as we will be patching into each domain individually
             unset($payload['form_params']['snis[]']);
 
             foreach ($certificate->getDomains() as $domain) {
@@ -91,7 +91,6 @@ class Handler
                     );
                 } catch (ClientException|GuzzleException $patchException) {
                     $this->errors[] = $patchException;
-                    continue;
                 }
             }
         }
@@ -127,7 +126,6 @@ class Handler
                 return true;
 
             case $response->getStatusCode() === 400:
-                $response->getBody()->rewind();
                 $decoded = json_decode($response->getBody()->getContents());
 
                 return \preg_match('/already associated with existing certificate/', $decoded->message ?? '') > 0;
