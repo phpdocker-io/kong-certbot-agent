@@ -27,6 +27,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UpdateCertificatesCommand extends Command
 {
+    private const COMMAND_NAME = 'certs:update';
+
     /**
      * @var Guzzle
      */
@@ -39,7 +41,7 @@ class UpdateCertificatesCommand extends Command
 
     public function __construct(Guzzle $guzzle, ShellExec $shellExec)
     {
-        parent::__construct(null);
+        parent::__construct(self::COMMAND_NAME);
 
         $this->guzzle    = $guzzle;
         $this->shellExec = $shellExec;
@@ -52,7 +54,6 @@ class UpdateCertificatesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('certs:update')
             ->setDescription('Requests certificates from Let\'s Encrypt for the given domains and notifies Kong')
             ->addArgument(
                 'kong-endpoint',
