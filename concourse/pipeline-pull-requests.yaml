@@ -27,30 +27,8 @@ jobs:
           path: code
           status: pending
 
-      - task: unit tests
-        config:
-          platform: linux
-          inputs:
-            - name: code
-          image_resource:
-            type: docker-image
-            source:
-              repository: phpdockerio/php72-cli
-          caches:
-            - path: code/vendor
-          run:
-            path: /bin/sh
-            args:
-              - -xce
-              - |
-                apt-get update
-                apt-get install -y php-xdebug
-
-                cd code
-
-                composer -o install
-                vendor/bin/phpunit
-                vendor/bin/infection
+      - task: run tests
+        file: code/concourse/task-run-tests.yaml
 
         on_failure:
           put: code

@@ -1,7 +1,7 @@
 platform: linux
 
 inputs:
-  - name: kong-certbot-agent
+  - name: code
 
 image_resource:
   type: docker-image
@@ -9,7 +9,7 @@ image_resource:
     repository: phpdockerio/php72-cli
 
 caches:
-  - path: kong-certbot-agent/vendor
+  - path: code/vendor
 
 run:
-  path: kong-certbot-agent/concourse/unit-tests.sh
+  path: code/concourse/tests.sh
