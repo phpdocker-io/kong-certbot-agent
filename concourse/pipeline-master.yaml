@@ -22,7 +22,7 @@ resources:
       access_token: {{github-access-token}}
 
 jobs:
-  - name: tests
+  - name: Run tests
     public: true
     plan:
       - get: code

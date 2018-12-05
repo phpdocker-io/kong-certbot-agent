@@ -15,7 +15,7 @@ resources:
       disable_ci_skip: false
 
 jobs:
-  - name: tests
+  - name: Run tests
     public: true
     plan:
       - get: code
@@ -39,4 +39,4 @@ jobs:
       - put: code
         params:
           path: code
-          status: pending
+          status: success
