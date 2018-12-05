@@ -2,7 +2,7 @@
 apt-get update
 apt-get install -y php-xdebug
 
-cd kong-certbot-agent
+cd code
 
 composer -o install
 vendor/bin/phpunit
