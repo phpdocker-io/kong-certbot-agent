@@ -6,9 +6,11 @@ namespace Tests\PhpDockerIo\KongCertbot\Kong;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use PhpDockerIo\KongCertbot\Certificate;
+use PhpDockerIo\KongCertbot\Kong\Error;
 use PhpDockerIo\KongCertbot\Kong\Handler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -101,21 +103,18 @@ class HandlerTest extends TestCase
      */
     public function storeHandlesUnknownKongError(int $statusCode): void
     {
-        $certificate = new Certificate('foo', 'bar', ['foo.bar', 'bar.foo', 'doom.bar']);
+        $domains      = ['foo.bar', 'bar.foo', 'doom.bar'];
+        $certificate  = new Certificate('foo', 'bar', $domains);
+        $errorMessage = 'foobar';
 
-        $response  = $this->getMockBuilder(ResponseInterface::class)->getMock();
-        $body      = $this->getMockBuilder(StreamInterface::class)->getMock();
-        $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
+        /** @var RequestInterface|MockObject $request */
+        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
 
-        $this->httpClient
-            ->expects(self::once())
-            ->method('request')
-            ->willThrowException($exception);
+        /** @var ResponseInterface|MockObject $response */
+        $response = $this->getMockBuilder(ResponseInterface::class)->getMock();
 
-        $exception
-            ->expects(self::any())
-            ->method('getResponse')
-            ->willReturn($response);
+        /** @var StreamInterface|MockObject $body */
+        $body = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $response
             ->expects(self::any())
@@ -136,8 +135,19 @@ class HandlerTest extends TestCase
             ->method('getContents')
             ->willReturn(\json_encode(['foo']));
 
+        $exception = new ClientException($errorMessage, $request, $response);
+
+        $this->httpClient
+            ->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        $expectedErrors = [
+            new Error($statusCode, $domains, $errorMessage),
+        ];
+
         self::assertFalse($this->handler->store($certificate));
-        self::assertEquals([$exception], $this->handler->getErrors());
+        self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
     public function unknownKongErrors(): array
@@ -153,22 +163,26 @@ class HandlerTest extends TestCase
      */
     public function storeHadlesKongEmptyResponse(): void
     {
-        $certificate = new Certificate('foo', 'bar', ['foo.bar', 'bar.foo', 'doom.bar']);
+        $domains      = ['foo.bar', 'bar.foo', 'doom.bar'];
+        $certificate  = new Certificate('foo', 'bar', $domains);
+        $errorMessage = 'lalala';
 
-        $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
+        /** @var RequestInterface|MockObject $request */
+        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
+
+        $exception = new ClientException($errorMessage, $request, null);
 
         $this->httpClient
             ->expects(self::once())
             ->method('request')
             ->willThrowException($exception);
 
-        $exception
-            ->expects(self::any())
-            ->method('getResponse')
-            ->willReturn(null);
+        $expectedErrors = [
+            new Error(0, $domains, $errorMessage),
+        ];
 
         self::assertFalse($this->handler->store($certificate));
-        self::assertEquals([$exception], $this->handler->getErrors());
+        self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
     /**
@@ -338,17 +352,22 @@ JSON;
      */
     public function storeHandlesHttpExceptionOnPatch(): void
     {
-        $certificate = new Certificate('foo', 'bar', ['foo.bar']);
+        $domains     = ['foo.bar'];
+        $certificate = new Certificate('foo', 'bar', $domains);
 
-        $response         = $this->getMockBuilder(ResponseInterface::class)->getMock();
-        $exception        = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
-        $anotherException = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
+        $secondErrorStatus = 500;
+        $secondErrorMsg    = 'covfefe';
 
-        $this->httpClient
-            ->expects(self::at(0))
-            ->method('request')
-            ->with('post')
-            ->willThrowException($exception);
+        /** @var RequestInterface|MockObject $request */
+        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
+
+        /** @var ResponseInterface|MockObject $response */
+        $response = $this->getMockBuilder(ResponseInterface::class)->getMock();
+
+        /** @var ResponseInterface|MockObject $response */
+        $secondResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+
+        $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
 
         $exception
             ->expects(self::any())
@@ -360,13 +379,30 @@ JSON;
             ->method('getStatusCode')
             ->willReturn(409);
 
+        $secondResponse
+            ->expects(self::any())
+            ->method('getStatusCode')
+            ->willReturn($secondErrorStatus);
+
+        $this->httpClient
+            ->expects(self::at(0))
+            ->method('request')
+            ->with('post')
+            ->willThrowException($exception);
+
+        $anotherException = new ClientException($secondErrorMsg, $request, $secondResponse);
+
         $this->httpClient
             ->expects(self::at(1))
             ->method('request')
             ->with('patch')
             ->willThrowException($anotherException);
 
+        $expectedErrors = [
+            new Error($secondErrorStatus, $domains, $secondErrorMsg),
+        ];
+
         self::assertFalse($this->handler->store($certificate));
-        self::assertEquals([$anotherException], $this->handler->getErrors());
+        self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 }

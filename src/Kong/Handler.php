@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Kong;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -74,7 +73,7 @@ class Handler
         } catch (ClientException $ex) {
             // Update certificates only on conflict
             if ($this->isConflict($ex) === false) {
-                $this->errors[] = $ex;
+                $this->errors[] = new Error($ex->getCode(), $certificate->getDomains(), $ex->getMessage());
 
                 return false;
             }
@@ -90,7 +89,7 @@ class Handler
                         $payload
                     );
                 } catch (ClientException|GuzzleException $patchException) {
-                    $this->errors[] = $patchException;
+                    $this->errors[] = new Error($patchException->getCode(), [$domain], $patchException->getMessage());
                 }
             }
         }
@@ -101,7 +100,7 @@ class Handler
     }
 
     /**
-     * @return ClientException[]|GuzzleException[]
+     * @return Error[]
      */
     public function getErrors(): array
     {
