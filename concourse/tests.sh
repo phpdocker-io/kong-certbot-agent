@@ -11,6 +11,9 @@ apt-get update
 apt-get install -y php-xdebug
 phpdismod xdebug
 
+# Static analysis
+# vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
+
 # Store in here any test artifacts
 mkdir /tmp/reports/
 
