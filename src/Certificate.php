@@ -30,7 +30,7 @@ class Certificate
         }
 
         if (\trim($key) === '') {
-            throw new \InvalidArgumentException('Empty cert');
+            throw new \InvalidArgumentException('Empty key');
         }
 
         if (\count($domains) === 0) {
