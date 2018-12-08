@@ -24,6 +24,8 @@ class HandlerTest extends TestCase
 
     private $certsBasePath = __DIR__ . '/fixtures';
 
+    private $tmpCertPath = '/tmp/foo.bar';
+
     public function setUp()
     {
         parent::setUp();
@@ -31,6 +33,27 @@ class HandlerTest extends TestCase
         $this->shellExec = $this->getMockBuilder(ShellExec::class)->getMock();
 
         $this->handler = new Handler($this->shellExec, $this->certsBasePath);
+
+        \mkdir($this->tmpCertPath);
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $fullChain = $this->tmpCertPath . '/fullchain.pem';
+        if (\file_exists($fullChain) === true) {
+            unlink($fullChain);
+        }
+
+        $privKey = $this->tmpCertPath . '/privkey.pem';
+        if (\file_exists($privKey) === true) {
+            unlink($privKey);
+        }
+
+        if (\file_exists($this->tmpCertPath) === true) {
+            \rmdir($this->tmpCertPath);
+        }
     }
 
     /**
@@ -81,9 +104,53 @@ class HandlerTest extends TestCase
 
     /**
      * @test
+     * @expectedException \PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException
+     * @expectedExceptionMessageRegExp /fullchain\.pem/
+     */
+    public function acquireCertificatesHandlesMissingFullChain(): void
+    {
+        \touch($this->tmpCertPath . '/privkey.pem');
+
+        $domains = ['foo.bar'];
+        $email   = 'foo@bar';
+
+        $this->shellExec
+            ->expects(self::once())
+            ->method('exec')
+            ->willReturn(true);
+
+        $handler = new Handler($this->shellExec, '/tmp');
+
+        $handler->acquireCertificate($domains, $email, false);
+    }
+
+    /**
+     * @test
+     * @expectedException \PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException
+     * @expectedExceptionMessageRegExp /privkey\.pem/
+     */
+    public function acquireCertificatesHandlesMissingPrivKey(): void
+    {
+        \touch($this->tmpCertPath . '/fullchain.pem');
+
+        $domains = ['foo.bar'];
+        $email   = 'foo@bar';
+
+        $this->shellExec
+            ->expects(self::once())
+            ->method('exec')
+            ->willReturn(true);
+
+        $handler = new Handler($this->shellExec, '/tmp');
+
+        $handler->acquireCertificate($domains, $email, false);
+    }
+
+    /**
+     * @test
      * @dataProvider commandDataProvider
      */
-    public function acquireCertificateSucceedsWithTestCert(bool $testCert, string $expectedCommand): void
+    public function acquireCertificateSucceeds(bool $testCert, string $expectedCommand): void
     {
         $domains = ['foo.bar', 'lala.foo.bar'];
         $email   = 'foo@bar';

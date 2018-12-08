@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Certbot;
 
+use PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException;
 use PhpDockerIo\KongCertbot\Certificate;
 
 /**
@@ -45,6 +46,7 @@ class Handler
      * @param bool     $testCert
      *
      * @return Certificate
+     * @throws CertFileNotFoundException
      */
     public function acquireCertificate(array $domains, string $email, bool $testCert): Certificate
     {
@@ -65,15 +67,30 @@ class Handler
         $cmdStatus = $this->shellExec->exec($renewCmd);
 
         if ($cmdStatus === false) {
-            $this->errors[] = new Error( $this->shellExec->getOutput(), 1, $domains);
+            $this->errors[] = new Error($this->shellExec->getOutput(), 1, $domains);
             throw new \RuntimeException('Certbot execution failed');
         }
 
         $basePath = sprintf('%s/%s', $this->certsBasePath, $firstDomain);
 
+        // Ensure certs have actually been created
+        $fullChainPath = \sprintf('%s/fullchain.pem', $basePath);
+        if (\file_exists($fullChainPath) === false) {
+            throw new CertFileNotFoundException($fullChainPath, $domains);
+        }
+
+        $privateKeyPath = \sprintf('%s/privkey.pem', $basePath);
+        if (\file_exists($privateKeyPath) === false) {
+            throw new CertFileNotFoundException($privateKeyPath, $domains);
+        }
+
+        // Ensure certs are readable
+        $fullChain  = \file_get_contents($fullChainPath);
+        $privateKey = \file_get_contents($privateKeyPath);
+
         return new Certificate(
-            \file_get_contents(\sprintf('%s/fullchain.pem', $basePath)),
-            \file_get_contents(\sprintf('%s/privkey.pem', $basePath)),
+            $fullChain !== false ? $fullChain : '',
+            $privateKey !== false ? $privateKey : '',
             $domains
         );
     }

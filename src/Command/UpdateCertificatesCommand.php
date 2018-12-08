@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace PhpDockerIo\KongCertbot\Command;
 
 use GuzzleHttp\ClientInterface as Guzzle;
-use GuzzleHttp\Exception\ClientException;
-use PhpDockerIo\KongCertbot\Certbot\Error;
+use PhpDockerIo\KongCertbot\Certbot\Error as CertbotError;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Certbot\ShellExec;
+use PhpDockerIo\KongCertbot\Kong\Error as KongError;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -89,10 +89,20 @@ class UpdateCertificatesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Parse input
-        $email        = $input->getArgument('email');
+
+        /** @var string $email */
+        $email = $input->getArgument('email');
+
+        /** @var string $kongAdminUri */
         $kongAdminUri = $input->getArgument('kong-endpoint');
-        $domains      = $this->parseDomains($input->getArgument('domains'));
-        $testCert     = $input->getOption('test-cert');
+
+        /** @var string $concatDomains */
+        $concatDomains = $input->getArgument('domains');
+
+        $domains = $this->parseDomains($concatDomains);
+
+        /** @var bool $testCert */
+        $testCert = $input->getOption('test-cert');
 
         $this->validateInput($email, $kongAdminUri, $domains, $testCert);
 
@@ -121,14 +131,14 @@ class UpdateCertificatesCommand extends Command
      * Parses the list of domains given from the command line, cleans it up and returns it as an array
      * of individual domains.
      *
-     * @param string $domainsRaw
+     * @param string $concatDomains
      *
      * @return string[]
      */
-    private function parseDomains(string $domainsRaw): array
+    private function parseDomains(string $concatDomains): array
     {
         $domains = [];
-        foreach (\explode(',', $domainsRaw) as $domain) {
+        foreach (\explode(',', $concatDomains) as $domain) {
             if (empty($domain) === false) {
                 $domains[] = $domain;
             }
@@ -140,9 +150,9 @@ class UpdateCertificatesCommand extends Command
     /**
      * @todo
      *
-     * @param ClientException[] $kongErrors
-     * @param Error[]           $certbotErrors
-     * @param OutputInterface   $output
+     * @param KongError[]     $kongErrors
+     * @param CertbotError[]  $certbotErrors
+     * @param OutputInterface $output
      */
     private function reportErrors(array $kongErrors, array $certbotErrors, OutputInterface $output): void
     {
