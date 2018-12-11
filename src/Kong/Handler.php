@@ -94,7 +94,9 @@ class Handler
             }
         }
 
-        $this->output->writeln(\sprintf('Certificate for domain %s correctly sent to Kong', $outputDomains));
+        $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
+
+        $this->output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
 
         return \count($this->errors) === 0;
     }

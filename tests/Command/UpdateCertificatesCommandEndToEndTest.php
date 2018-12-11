@@ -93,6 +93,11 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             'domains'       => $domains,
             'kong-endpoint' => self::KONG_ENDPOINT,
         ]));
+
+        $output = $this->command->getDisplay();
+
+        self::assertContains('Updating certificates config for foo.bar', $output);
+        self::assertContains('Certificate for foo.bar correctly sent to Kong', $output);
     }
 
     /**
@@ -146,5 +151,10 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             'kong-endpoint' => self::KONG_ENDPOINT,
             '--test-cert'   => true,
         ]));
+
+        $output = $this->command->getDisplay();
+
+        self::assertContains('Updating certificates config for foo.bar, lalala.com', $output);
+        self::assertContains('Certificates for foo.bar, lalala.com correctly sent to Kong', $output);
     }
 }
