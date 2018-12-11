@@ -5,7 +5,6 @@ namespace PhpDockerIo\KongCertbot\Kong;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\GuzzleException;
 use PhpDockerIo\KongCertbot\Certificate;
 
 /**
@@ -21,7 +20,7 @@ class Handler
     private $guzzle;
 
     /**
-     * @var ClientException[]|GuzzleException[]
+     * @var Error[]
      */
     private $errors = [];
 
@@ -37,7 +36,6 @@ class Handler
      * @param string      $kongAdminUri
      *
      * @return bool
-     * @throws GuzzleException
      */
     public function store(Certificate $certificate, string $kongAdminUri): bool
     {
@@ -73,7 +71,7 @@ class Handler
                         \sprintf('%s/certificates/%s', $kongAdminUri, $domain),
                         $payload
                     );
-                } catch (ClientException|GuzzleException $patchException) {
+                } catch (ClientException $patchException) {
                     $this->errors[] = new Error($patchException->getCode(), [$domain], $patchException->getMessage());
                 }
             }
@@ -99,16 +97,19 @@ class Handler
      */
     private function isConflict(ClientException $ex): bool
     {
-        $response = $ex->getResponse();
+        $response         = $ex->getResponse();
+        $responseCode     = $response !== null ? $response->getStatusCode() : false;
+        $responseContents = $response !== null ? $response->getBody()->getContents() : '';
+
         switch (true) {
             case $response === null:
                 return false;
 
-            case $response->getStatusCode() === 409:
+            case $responseCode === 409:
                 return true;
 
-            case $response->getStatusCode() === 400:
-                $decoded = json_decode($response->getBody()->getContents());
+            case $responseCode === 400:
+                $decoded = json_decode($responseContents);
 
                 return \preg_match('/already associated with existing certificate/', $decoded->message ?? '') > 0;
 

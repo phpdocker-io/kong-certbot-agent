@@ -189,6 +189,7 @@ class HandlerTest extends TestCase
         $certificate = new Certificate('foo', 'bar', ['foo.bar']);
 
         $response  = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $body      = $this->getMockBuilder(StreamInterface::class)->getMock();
         $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
 
         $this->httpClient
@@ -215,6 +216,11 @@ class HandlerTest extends TestCase
             ->expects(self::any())
             ->method('getResponse')
             ->willReturn($response);
+
+        $response
+            ->expects(self::any())
+            ->method('getBody')
+            ->willReturn($body);
 
         $response
             ->expects(self::any())
@@ -305,6 +311,7 @@ JSON;
         $certificate = new Certificate('foo', 'bar', $domains);
 
         $response  = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $body      = $this->getMockBuilder(StreamInterface::class)->getMock();
         $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
 
         $this->httpClient
@@ -339,6 +346,11 @@ JSON;
             ->method('getStatusCode')
             ->willReturn(409);
 
+        $response
+            ->expects(self::any())
+            ->method('getBody')
+            ->willReturn($body);
+
         self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
@@ -365,6 +377,9 @@ JSON;
 
         $exception = $this->getMockBuilder(ClientException::class)->disableOriginalConstructor()->getMock();
 
+        $body = $this->getMockBuilder(StreamInterface::class)->getMock();
+
+
         $exception
             ->expects(self::any())
             ->method('getResponse')
@@ -374,6 +389,11 @@ JSON;
             ->expects(self::any())
             ->method('getStatusCode')
             ->willReturn(409);
+
+        $response
+            ->expects(self::any())
+            ->method('getBody')
+            ->willReturn($body);
 
         $secondResponse
             ->expects(self::any())
