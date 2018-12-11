@@ -72,13 +72,79 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
         $this->httpClient
             ->expects(self::once())
             ->method('request')
-            ->with('post', $endpoint)
+            ->with('post', $endpoint, self::callback(function (array $argument) {
+                self::assertArrayHasKey('form_params', $argument);
+
+                // Cert values match fixtures
+                $expectedParams = [
+                    'cert'   => "foo\n",
+                    'key'    => "bar\n",
+                    'snis[]' => ['foo.bar'],
+                ];
+
+                self::assertEquals($expectedParams, $argument['form_params']);
+
+                return true;
+            }))
             ->willReturn(true);
 
-        $this->command->execute([
+        self::assertSame(0, $this->command->execute([
             'email'         => 'foo@bar',
-            'domains'       => self::MAIN_DOMAIN,
+            'domains'       => $domains,
             'kong-endpoint' => self::KONG_ENDPOINT,
-        ]);
+        ]));
+    }
+
+    /**
+     * @test
+     */
+    public function stagingCertificateIsCreatedSuccessfullyForTwoDomains(): void
+    {
+        $secondDomain = 'lalala.com';
+        $email        = 'foo@bar';
+        $domains      = self::MAIN_DOMAIN . ',' . $secondDomain;
+        $endpoint     = self::KONG_ENDPOINT . '/certificates';
+
+        $expectedCertbotCommand = sprintf(
+            'certbot certonly --test-cert --agree-tos --standalone --preferred-challenges http -n -m %s --expand -d %s -d %s',
+            $email,
+            self::MAIN_DOMAIN,
+            $secondDomain
+        );
+
+        $this->shellExec
+            ->expects(self::once())
+            ->method('exec')
+            ->with($expectedCertbotCommand)
+            ->willReturn(true);
+
+        $this->httpClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('post', $endpoint, self::callback(function (array $argument) {
+                self::assertArrayHasKey('form_params', $argument);
+
+                // Cert values match fixtures
+                $expectedParams = [
+                    'cert'   => "foo\n",
+                    'key'    => "bar\n",
+                    'snis[]' => [
+                        'foo.bar',
+                        'lalala.com',
+                    ],
+                ];
+
+                self::assertEquals($expectedParams, $argument['form_params']);
+
+                return true;
+            }))
+            ->willReturn(true);
+
+        self::assertSame(0, $this->command->execute([
+            'email'         => 'foo@bar',
+            'domains'       => $domains,
+            'kong-endpoint' => self::KONG_ENDPOINT,
+            '--test-cert'   => true,
+        ]));
     }
 }

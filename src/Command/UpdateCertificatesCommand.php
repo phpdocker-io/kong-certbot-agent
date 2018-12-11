@@ -118,16 +118,20 @@ class UpdateCertificatesCommand extends Command
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
-        $certificate = $certbot->acquireCertificate($domains, $email, $testCert);
+        try {
+            $certificate = $certbot->acquireCertificate($domains, $email, $testCert);
 
-        // Store certs into kong via the admin UI. Again, not all-or-nothing
-        $kong->store($certificate);
+            // Store certs into kong via the admin UI. Again, not all-or-nothing
+            $kong->store($certificate);
+        } catch (\Throwable $ex) {
+            // Capture errors for reporting - some certs might have succeeded, but we do need to
+            // exit appropriately for whatever orchestrator to realise there were problems
+            if (\count($kong->getErrors()) > 0 || \count($certbot->getErrors()) > 0) {
+                $this->reportErrors($kong->getErrors(), $certbot->getErrors(), $output);
+                return 1;
+            }
 
-        // Capture errors for reporting - some certs might have succeeded, but we do need to
-        // exit appropriately for whatever orchestrator to realise there were problems
-        if (\count($kong->getErrors()) > 0 || \count($certbot->getErrors()) > 0) {
-            $this->reportErrors($kong->getErrors(), $certbot->getErrors(), $output);
-            return 1;
+            throw $ex;
         }
 
         return 0;
