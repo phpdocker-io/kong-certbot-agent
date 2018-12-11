@@ -116,7 +116,8 @@ class UpdateCertificatesCommand extends Command
 
         // Spawn kong and certbot handlers with config and dependencies
         $kong    = new Kong($this->guzzle);
-        $certbot = new Certbot($this->shellExec, $this->certsBasePath);
+        $certbot = new Certbot($this->shellExec);
+        $certbot->setCertsBasePath($this->certsBasePath);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
