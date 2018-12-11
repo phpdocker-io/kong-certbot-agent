@@ -35,7 +35,7 @@ class CertificateTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Empty domains
      */
-    public function constructorHandlesEmptListOfDomains(): void
+    public function constructorHandlesEmptyListOfDomains(): void
     {
         new Certificate('bar', 'foo', []);
     }

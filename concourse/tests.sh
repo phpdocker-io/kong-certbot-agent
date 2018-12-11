@@ -19,7 +19,7 @@ mkdir /tmp/reports/
 
 # Run unit tests
 composer -o install
-vendor/bin/phpunit
+vendor/bin/phpunit --testdox
 
 # Placeholder for extracting coverage metric
 echo "fo" > /tmp/reports/phpunit
