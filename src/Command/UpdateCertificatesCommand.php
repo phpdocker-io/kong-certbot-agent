@@ -39,12 +39,18 @@ class UpdateCertificatesCommand extends Command
      */
     private $shellExec;
 
-    public function __construct(Guzzle $guzzle, ShellExec $shellExec)
+    /**
+     * @var string|null
+     */
+    private $certsBasePath;
+
+    public function __construct(Guzzle $guzzle, ShellExec $shellExec, string $certsBasePath = null)
     {
         parent::__construct(self::COMMAND_NAME);
 
-        $this->guzzle    = $guzzle;
-        $this->shellExec = $shellExec;
+        $this->guzzle        = $guzzle;
+        $this->shellExec     = $shellExec;
+        $this->certsBasePath = $certsBasePath;
     }
     /**
      * Set the arguments and options required for the command line tool.
@@ -108,14 +114,14 @@ class UpdateCertificatesCommand extends Command
 
         // Spawn kong and certbot handlers with config and dependencies
         $kong    = new Kong($kongAdminUri, $this->guzzle, $output);
-        $certbot = new Certbot($this->shellExec);
+        $certbot = new Certbot($this->shellExec, $this->certsBasePath);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
-        $certificates = $certbot->acquireCertificate($domains, $email, $testCert);
+        $certificate = $certbot->acquireCertificate($domains, $email, $testCert);
 
         // Store certs into kong via the admin UI. Again, not all-or-nothing
-        $kong->store($certificates);
+        $kong->store($certificate);
 
         // Capture errors for reporting - some certs might have succeeded, but we do need to
         // exit appropriately for whatever orchestrator to realise there were problems
