@@ -1,0 +1,42 @@
+version: 2.1
+resource_types:
+  # Set status of build in github for master
+  - name: github-status
+    type: docker-image
+    source:
+      repository: dpb587/github-status-resource
+      tag: master
+
+resources:
+  - name: code
+    type: git
+    source:
+      uri: https://github.com/luispabon/kong-certbot-agent.git
+      branch: master
+
+  - name: master-status
+    type: github-status
+    source:
+      repository: luispabon/kong-certbot-agent
+      branch: master
+      access_token: {{github-access-token}}
+
+jobs:
+  - name: Run tests
+    public: true
+    plan:
+      - get: code
+        trigger: true
+
+      - put: master-status
+        params: { state: "pending", commit: "code" }
+
+      - task: run tests
+        file: code/concourse/task-run-tests.yaml
+
+        on_failure:
+          put: master-status
+          params: { state: "failure", commit: "code" }
+
+      - put: master-status
+        params: { state: "success", commit: "code" }

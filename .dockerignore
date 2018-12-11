@@ -3,3 +3,5 @@
 kubernetes
 vendor
 .dockerignore
+reports
+tests

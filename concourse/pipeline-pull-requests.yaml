@@ -1,0 +1,42 @@
+version: 2.1
+resource_types:
+  # Set status of build in github for pull requests
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+resources:
+  - name: code
+    type: pull-request
+    source:
+      repository: luispabon/kong-certbot-agent
+      access_token: {{github-access-token}}
+      disable_ci_skip: false
+
+jobs:
+  - name: Run tests
+    public: true
+    plan:
+      - get: code
+        trigger: true
+        version: every
+
+      - put: code
+        params:
+          path: code
+          status: pending
+
+      - task: run tests
+        file: code/concourse/task-run-tests.yaml
+
+        on_failure:
+          put: code
+          params:
+            path: code
+            status: failure
+
+      - put: code
+        params:
+          path: code
+          status: success
