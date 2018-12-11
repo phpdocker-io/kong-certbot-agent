@@ -30,10 +30,22 @@ class Handler
      */
     private $certsBasePath;
 
-    public function __construct(ShellExec $shellExec, string $certsBasePath = null)
+    public function __construct(ShellExec $shellExec)
     {
         $this->shellExec     = $shellExec;
-        $this->certsBasePath = $certsBasePath ?? self::DEFAULT_CERTS_BASE_PATH;
+        $this->certsBasePath = self::DEFAULT_CERTS_BASE_PATH;
+    }
+
+    /**
+     * @param string $certsBasePath
+     *
+     * @return Handler
+     */
+    public function setCertsBasePath(string $certsBasePath): self
+    {
+        $this->certsBasePath = $certsBasePath;
+
+        return $this;
     }
 
     /**

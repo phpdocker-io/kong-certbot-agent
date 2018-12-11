@@ -32,7 +32,8 @@ class HandlerTest extends TestCase
 
         $this->shellExec = $this->getMockBuilder(ShellExec::class)->getMock();
 
-        $this->handler = new Handler($this->shellExec, $this->certsBasePath);
+        $this->handler = new Handler($this->shellExec);
+        $this->handler->setCertsBasePath($this->certsBasePath);
 
         \mkdir($this->tmpCertPath);
     }
@@ -119,9 +120,10 @@ class HandlerTest extends TestCase
             ->method('exec')
             ->willReturn(true);
 
-        $handler = new Handler($this->shellExec, '/tmp');
-
-        $handler->acquireCertificate($domains, $email, false);
+        $handler = new Handler($this->shellExec);
+        $handler
+            ->setCertsBasePath('/tmp')
+            ->acquireCertificate($domains, $email, false);
     }
 
     /**
@@ -141,9 +143,10 @@ class HandlerTest extends TestCase
             ->method('exec')
             ->willReturn(true);
 
-        $handler = new Handler($this->shellExec, '/tmp');
-
-        $handler->acquireCertificate($domains, $email, false);
+        $handler = new Handler($this->shellExec);
+        $handler
+            ->setCertsBasePath('/tmp')
+            ->acquireCertificate($domains, $email, false);
     }
 
     /**
