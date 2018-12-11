@@ -60,7 +60,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
      */
     public function certificateIsCreatedSuccessfullyForOneDomain(): void
     {
-        $email    = 'foo@bar';
+        $email    = 'foo@bar.com';
         $domains  = self::MAIN_DOMAIN;
         $endpoint = self::KONG_ENDPOINT . '/certificates';
 
@@ -96,7 +96,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             ->willReturn(true);
 
         self::assertSame(0, $this->command->execute([
-            'email'         => 'foo@bar',
+            'email'         => $email,
             'domains'       => $domains,
             'kong-endpoint' => self::KONG_ENDPOINT,
         ]));
@@ -113,7 +113,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
     public function stagingCertificateIsCreatedSuccessfullyForTwoDomains(): void
     {
         $secondDomain = 'lalala.com';
-        $email        = 'foo@bar';
+        $email        = 'foo@bar.com';
         $domains      = self::MAIN_DOMAIN . ',' . $secondDomain;
         $endpoint     = self::KONG_ENDPOINT . '/certificates';
 
@@ -153,7 +153,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             ->willReturn(true);
 
         self::assertSame(0, $this->command->execute([
-            'email'         => 'foo@bar',
+            'email'         => $email,
             'domains'       => $domains,
             'kong-endpoint' => self::KONG_ENDPOINT,
             '--test-cert'   => true,
