@@ -18,6 +18,6 @@ class InvalidCertFileException extends \RuntimeException
             \implode(', ', $domains)
         );
 
-        parent::__construct($message, 0);
+        parent::__construct($message);
     }
 }
