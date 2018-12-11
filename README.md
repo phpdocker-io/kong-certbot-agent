@@ -1,3 +1,5 @@
+[![Build status](https://ci.auronconsulting.co.uk/api/v1/teams/main/pipelines/kong-certbot-agent-master/jobs/Run%20tests/badge)](https://ci.auronconsulting.co.uk/teams/main/pipelines/kong-certbot-agent-master)
+
 # Kong Certbot agent
 Let's Encrypt integration with Kong
 
