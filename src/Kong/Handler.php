@@ -7,7 +7,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use PhpDockerIo\KongCertbot\Certificate;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Handles communication with Kong given a bunch of certificates.
@@ -22,40 +21,26 @@ class Handler
     private $guzzle;
 
     /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var string
-     */
-    private $kongAdminUri;
-
-    /**
      * @var ClientException[]|GuzzleException[]
      */
     private $errors = [];
 
-    public function __construct(string $kongAdminUri, ClientInterface $guzzle, OutputInterface $output)
+    public function __construct(ClientInterface $guzzle)
     {
-        $this->kongAdminUri = $kongAdminUri;
-        $this->guzzle       = $guzzle;
-        $this->output       = $output;
+        $this->guzzle = $guzzle;
     }
 
     /**
      * Stores the given certificate in Kong.
      *
      * @param Certificate $certificate
+     * @param string      $kongAdminUri
      *
      * @return bool
      * @throws GuzzleException
      */
-    public function store(Certificate $certificate): bool
+    public function store(Certificate $certificate, string $kongAdminUri): bool
     {
-        $outputDomains = \implode(', ', $certificate->getDomains());
-        $this->output->writeln(\sprintf('Updating certificates config for %s', $outputDomains));
-
         $payload = [
             'headers'     => [
                 'accept' => 'application/json',
@@ -69,7 +54,7 @@ class Handler
 
         // Unfortunately for us, PUT is not UPSERT
         try {
-            $this->guzzle->request('post', \sprintf('%s/certificates', $this->kongAdminUri), $payload);
+            $this->guzzle->request('post', \sprintf('%s/certificates', $kongAdminUri), $payload);
         } catch (ClientException $ex) {
             // Update certificates only on conflict
             if ($this->isConflict($ex) === false) {
@@ -85,7 +70,7 @@ class Handler
                 try {
                     $this->guzzle->request(
                         'patch',
-                        \sprintf('%s/certificates/%s', $this->kongAdminUri, $domain),
+                        \sprintf('%s/certificates/%s', $kongAdminUri, $domain),
                         $payload
                     );
                 } catch (ClientException|GuzzleException $patchException) {
@@ -93,10 +78,6 @@ class Handler
                 }
             }
         }
-
-        $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
-
-        $this->output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
 
         return \count($this->errors) === 0;
     }

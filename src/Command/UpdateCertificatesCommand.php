@@ -107,22 +107,29 @@ class UpdateCertificatesCommand extends Command
 
         $domains = $this->parseDomains($concatDomains);
 
+        $outputDomains = \implode(', ', $domains);
+
         /** @var bool $testCert */
         $testCert = $input->getOption('test-cert');
 
         $this->validateInput($email, $kongAdminUri, $domains, $testCert);
 
         // Spawn kong and certbot handlers with config and dependencies
-        $kong    = new Kong($kongAdminUri, $this->guzzle, $output);
+        $kong    = new Kong($this->guzzle);
         $certbot = new Certbot($this->shellExec, $this->certsBasePath);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
         try {
+            $output->writeln(\sprintf('Updating certificates config for %s', $outputDomains));
             $certificate = $certbot->acquireCertificate($domains, $email, $testCert);
 
             // Store certs into kong via the admin UI. Again, not all-or-nothing
-            $kong->store($certificate);
+            $kong->store($certificate, $kongAdminUri);
+
+            $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
+
+            $output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
         } catch (\Throwable $ex) {
             // Capture errors for reporting - some certs might have succeeded, but we do need to
             // exit appropriately for whatever orchestrator to realise there were problems

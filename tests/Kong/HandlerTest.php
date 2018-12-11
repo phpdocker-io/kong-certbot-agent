@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class HandlerTest extends TestCase
 {
@@ -33,12 +32,9 @@ class HandlerTest extends TestCase
     {
         parent::setUp();
 
-        /** @var OutputInterface|MockObject $output */
-        $output = $this->getMockBuilder(OutputInterface::class)->getMock();
-
         $this->httpClient = $this->getMockBuilder(Client::class)->disableOriginalConstructor()->getMock();
 
-        $this->handler = new Handler(self::KONG_ADMIN_URI, $this->httpClient, $output);
+        $this->handler = new Handler($this->httpClient);
     }
 
     /**
@@ -65,7 +61,7 @@ class HandlerTest extends TestCase
             ])
             ->willReturn($response);
 
-        self::assertTrue($this->handler->store($certificate));
+        self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
 
@@ -93,7 +89,7 @@ class HandlerTest extends TestCase
             ])
             ->willReturn($response);
 
-        self::assertTrue($this->handler->store($certificate));
+        self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
 
@@ -146,7 +142,7 @@ class HandlerTest extends TestCase
             new Error($statusCode, $domains, $errorMessage),
         ];
 
-        self::assertFalse($this->handler->store($certificate));
+        self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
@@ -181,7 +177,7 @@ class HandlerTest extends TestCase
             new Error(0, $domains, $errorMessage),
         ];
 
-        self::assertFalse($this->handler->store($certificate));
+        self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
@@ -225,7 +221,7 @@ class HandlerTest extends TestCase
             ->method('getStatusCode')
             ->willReturn(409);
 
-        self::assertTrue($this->handler->store($certificate));
+        self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
 
@@ -296,7 +292,7 @@ JSON;
             ->method('getContents')
             ->willReturn($json);
 
-        self::assertTrue($this->handler->store($certificate));
+        self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
 
@@ -343,7 +339,7 @@ JSON;
             ->method('getStatusCode')
             ->willReturn(409);
 
-        self::assertTrue($this->handler->store($certificate));
+        self::assertTrue($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEmpty($this->handler->getErrors());
     }
 
@@ -402,7 +398,7 @@ JSON;
             new Error($secondErrorStatus, $domains, $secondErrorMsg),
         ];
 
-        self::assertFalse($this->handler->store($certificate));
+        self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
         self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 }
