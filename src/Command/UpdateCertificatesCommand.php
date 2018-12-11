@@ -109,7 +109,7 @@ class UpdateCertificatesCommand extends Command
         /** @var bool $testCert */
         $testCert = $input->getOption('test-cert');
 
-        $this->validateInput($email, $kongAdminUri, $domains, $testCert);
+        $this->validateInput($email, $kongAdminUri, $domains);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
