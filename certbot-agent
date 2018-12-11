@@ -3,12 +3,16 @@
 declare(strict_types=1);
 
 use GuzzleHttp\Client;
+use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Command\UpdateCertificatesCommand;
 use Symfony\Component\Console\Application;
+use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 
 include __DIR__ . '/vendor/autoload.php';
 
-$app = new Application('Kong certbot agent');
-$app->add(new UpdateCertificatesCommand(new Client(), new ShellExec()));
+$app     = new Application('Kong certbot agent');
+$kong    = new Kong(new Client());
+$certbot = new Certbot(new ShellExec());
+$app->add(new UpdateCertificatesCommand($kong, $certbot));
 $app->run();
