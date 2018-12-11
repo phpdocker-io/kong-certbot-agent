@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace Tests\PhpDockerIo\KongCertbot\Command;
 
 use GuzzleHttp\ClientInterface;
+use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Command\UpdateCertificatesCommand;
+use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use PHPStan\Testing\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
+
 
 /**
  * End to end functional test.
@@ -45,7 +48,11 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
         $this->httpClient = $this->getMockBuilder(ClientInterface::class)->getMock();
         $this->shellExec  = $this->getMockBuilder(ShellExec::class)->disableOriginalConstructor()->getMock();
 
-        $this->command = new CommandTester(new UpdateCertificatesCommand($this->httpClient, $this->shellExec, self::CERTS_BASE_PATH));
+        $this->command = new CommandTester(new UpdateCertificatesCommand(
+            new Kong($this->httpClient),
+            new Certbot($this->shellExec),
+            self::CERTS_BASE_PATH
+        ));
     }
 
     /**
