@@ -118,20 +118,29 @@ class UpdateCertificatesCommand extends Command
             $certificate = $this->certbot->acquireCertificate($domains, $email, $testCert);
 
             // Store certs into kong via the admin UI. Again, not all-or-nothing
-            $this->kong->store($certificate, $kongAdminUri);
+            if ($this->kong->store($certificate, $kongAdminUri) === true) {
+                $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
 
-            $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
-
-            $output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
+                $output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
+            }
         } catch (\Throwable $ex) {
-            // Capture errors for reporting - some certs might have succeeded, but we do need to
-            // exit appropriately for whatever orchestrator to realise there were problems
-            if (\count($this->kong->getErrors()) > 0 || \count($this->certbot->getErrors()) > 0) {
-                $this->reportErrors($this->kong->getErrors(), $this->certbot->getErrors(), $output);
+            // If no errors listed, unhandled exception
+            if (\count($this->kong->getErrors()) === 0 && \count($this->certbot->getErrors()) === 0) {
+                $output->writeln(\sprintf(
+                    'Unexpected error %s - %s',
+                    \get_class($ex),
+                    $ex->getMessage()
+                ));
+
                 return 1;
             }
+        }
 
-            throw $ex;
+        // Capture errors for reporting - some certs might have succeeded, but we do need to
+        // exit appropriately for whatever orchestrator to realise there were problems
+        if (\count($this->kong->getErrors()) > 0 || \count($this->certbot->getErrors()) > 0) {
+            $this->reportErrors($this->kong->getErrors(), $this->certbot->getErrors(), $output);
+            return 1;
         }
 
         return 0;
@@ -158,7 +167,7 @@ class UpdateCertificatesCommand extends Command
     }
 
     /**
-     * @todo
+     * List kong and certbot errors.
      *
      * @param KongError[]     $kongErrors
      * @param CertbotError[]  $certbotErrors
@@ -166,7 +175,24 @@ class UpdateCertificatesCommand extends Command
      */
     private function reportErrors(array $kongErrors, array $certbotErrors, OutputInterface $output): void
     {
-        $output->writeln('oops');
+        foreach ($kongErrors as $kongError) {
+            $output->writeln(\sprintf(
+                'Kong error: code %s, message %s, domains %s',
+                $kongError->getCode(),
+                $kongError->getMessage(),
+                \implode(', ', $kongError->getDomains())
+            ));
+        }
+
+
+        foreach ($certbotErrors as $certbotError) {
+            $output->writeln(\sprintf(
+                'Certbot error: command status %s, output `%s`, domains %s',
+                $certbotError->getCmdStatus(),
+                \json_encode($certbotError->getCmdOutput()),
+                \implode(', ', $certbotError->getDomains())
+            ));
+        }
     }
 
     /**
