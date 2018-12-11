@@ -158,6 +158,7 @@ class UpdateCertificatesCommand extends Command
     {
         $domains = [];
         foreach (\explode(',', $concatDomains) as $domain) {
+            $domain = \trim($domain);
             if (empty($domain) === false) {
                 $domains[] = $domain;
             }
@@ -196,14 +197,26 @@ class UpdateCertificatesCommand extends Command
     }
 
     /**
-     * @todo
+     * Validates user input
      *
-     * @param string $email
-     * @param string $kongAdminUri
-     * @param array  $domains
-     * @param bool   $testCert
+     * @param string   $email
+     * @param string   $kongAdminUri
+     * @param string[] $domains
+     *
+     * @throws \InvalidArgumentException
      */
-    private function validateInput(string $email, string $kongAdminUri, array $domains, bool $testCert): void
+    private function validateInput(string $email, string $kongAdminUri, array $domains): void
     {
+        if (\filter_var($email, FILTER_VALIDATE_EMAIL) !== $email) {
+            throw new \InvalidArgumentException(sprintf('Invalid email %s', $email));
+        }
+
+        if (\filter_var($kongAdminUri, FILTER_VALIDATE_URL) !== $kongAdminUri) {
+            throw new \InvalidArgumentException(sprintf('Invalid kong admin endpoint %s', $kongAdminUri));
+        }
+
+        if (\count($domains) === 0) {
+            throw new \InvalidArgumentException('Empty list of domains given - expect comma-separated');
+        }
     }
 }

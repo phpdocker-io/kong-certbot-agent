@@ -47,7 +47,7 @@ class UpdateCertificatesCommandTest extends TestCase
     public function executeSucceeds(): void
     {
         $domains = ['foo.bar', 'bar.foo'];
-        $email   = 'bar@foo';
+        $email   = 'bar@foo.com';
         $cert    = new Certificate('foo', 'bar', $domains);
 
         $this->certbot
@@ -74,13 +74,50 @@ class UpdateCertificatesCommandTest extends TestCase
         self::assertContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
     }
 
+
+    /**
+     * @test
+     */
+    public function executeSucceedsWithSlightliWonkyListOfDomains(): void
+    {
+        $domains = ['foo.bar', 'bar.foo'];
+        $email   = 'bar@foo.com';
+        $cert    = new Certificate('foo', 'bar', $domains);
+
+        // We have some filtering to avoid weird domain situations
+        $inputDomains = 'foo.bar,,bar.foo';
+
+        $this->certbot
+            ->expects(self::once())
+            ->method('acquireCertificate')
+            ->with($domains, $email, false)
+            ->willReturn($cert);
+
+        $this->kong
+            ->expects(self::once())
+            ->method('store')
+            ->with($cert)
+            ->willReturn(true);
+
+        self::assertSame(0, $this->command->execute([
+            'email'         => $email,
+            'domains'       => $inputDomains,
+            'kong-endpoint' => 'http://foobar',
+        ]));
+
+        $output = $this->command->getDisplay();
+
+        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+    }
+
     /**
      * @test
      */
     public function executeHandlesKongErrors(): void
     {
         $domains = ['foo.bar', 'bar.foo'];
-        $email   = 'bar@foo';
+        $email   = 'bar@foo.com';
         $cert    = new Certificate('foo', 'bar', $domains);
 
         $kongErrors = [
@@ -123,7 +160,7 @@ class UpdateCertificatesCommandTest extends TestCase
     public function executeHandlesCertbotErrors(): void
     {
         $domains = ['foo.bar', 'bar.foo'];
-        $email   = 'bar@foo';
+        $email   = 'bar@foo.com';
 
         $certbotErrors = [
             new CertbotError(['doom'], 1, $domains),
@@ -163,7 +200,7 @@ class UpdateCertificatesCommandTest extends TestCase
     public function executeHandlesCertbotCertNotFoundExceptions(): void
     {
         $domains = ['foo.bar', 'bar.foo'];
-        $email   = 'bar@foo';
+        $email   = 'bar@foo.com';
 
         $expectedException = new CertFileNotFoundException('foo', $domains);
 
@@ -193,5 +230,82 @@ class UpdateCertificatesCommandTest extends TestCase
         self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
         self::assertNotContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
         self::assertContains(CertFileNotFoundException::class, $output);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid email
+     * @dataProvider             invalidEmailsDataProvider
+     */
+    public function executeFailsOnInvalidEmail(string $invalidEmail): void
+    {
+        self::assertSame(1, $this->command->execute([
+            'email'         => $invalidEmail,
+            'domains'       => 'foo.bar',
+            'kong-endpoint' => 'http://foobar',
+        ]));
+    }
+
+    public function invalidEmailsDataProvider(): array
+    {
+        return [
+            ['5'],
+            ['foo@Bar'],
+            ['http://lalala.com'],
+            [''],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid kong admin endpoint
+     * @dataProvider             invalidKongEndpointsDataProvider
+     */
+    public function executeFailsOnInvalidKongAdminUri(string $invalidKongEndpoint): void
+    {
+        self::assertSame(1, $this->command->execute([
+            'email'         => 'foo@Bar.com',
+            'domains'       => 'foo.bar',
+            'kong-endpoint' => $invalidKongEndpoint,
+        ]));
+    }
+
+    public function invalidKongEndpointsDataProvider(): array
+    {
+        return [
+            ['5'],
+            ['foo@Bar'],
+            ['lalala.com'],
+            [''],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \InvalidArgumentException
+     * @dataProvider invalidListOfDomains
+     */
+    public function executeFailsOnInvalidListOfDomains(string $domains, string $expectedExceptionMessage): void
+    {
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        self::assertSame(1, $this->command->execute([
+            'email'         => 'foo@Bar.com',
+            'domains'       => $domains,
+            'kong-endpoint' => 'http://foo/bar',
+        ]));
+    }
+
+    public function invalidListOfDomains(): array
+    {
+        return [
+            ['', 'Empty list of domains given'],
+            ['  ,', 'Empty list of domains given'],
+        ];
     }
 }
