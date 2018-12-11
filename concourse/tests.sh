@@ -25,7 +25,7 @@ vendor/bin/phpunit --testdox
 echo "fo" > /tmp/reports/phpunit
 
 # Run mutation tests
-vendor/bin/infection --initial-tests-php-options="-d zend_extension=xdebug.so" --threads=2 -s --min-msi=60 --min-covered-msi=95
+vendor/bin/infection --initial-tests-php-options="-d zend_extension=xdebug.so" --threads=2 -s --min-msi=95 --min-covered-msi=95
 
 # Placeholder for extracting coverage metric
 echo "fa" > /tmp/reports/infection
