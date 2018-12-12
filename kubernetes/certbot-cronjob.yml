@@ -29,8 +29,8 @@ kind: CronJob
 metadata:
   name: kong-certbot-agent
 spec:
-  # Run job at 01:07 every 30 days
-  schedule: "7 1 */30 * * "
+  # Run job at 01:07 every 60 days
+  schedule: "7 1 */60 * * "
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:

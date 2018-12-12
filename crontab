@@ -1,2 +1,2 @@
 # /etc/docker-env is a dump of the environment made at entrypoint.sh, required as
-0 0 24 * * env - `cat /etc/docker-env` /workdir/certbot-agent certs:update $KONG_ENDPOINT $EMAIL $DOMAINS  > /var/log/cert-update.log 2>&1
+7 1 */60 * * env - `cat /etc/docker-env` /workdir/certbot-agent certs:update $KONG_ENDPOINT $EMAIL $DOMAINS  > /var/log/cert-update.log 2>&1
