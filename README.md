@@ -144,8 +144,7 @@ your initial set up while you manage to get all your stuff lined up together nic
 
 ### How often should I renew my certs?
 
-By default, certbot has a limit of 50 certificate requests, so bear this in mind. Also, certs are good for 3 months. Once
-a week should be more than enough.
+By default, certbot has a limit of 50 certificate requests, so bear this in mind. Also, certs are good for 3 months. Let's Encrypt themselves recommend once every 60 days. [The example kubernetes cronjob](kubernetes/certbot-cronjob.yml)
+is setup like so. 
 
-That being said, Let's Encrypt themselves recommend once every 60 days. [The example kubernetes cronjob](kubernetes/certbot-cronjob.yml)
-is setup like so.
+You can certainly do it more often, but there's no point in spamming Let's Encrypt with extra requests - remember this is a shared resource, free as in freedom and beer, and someone surely pays for it. Be considerate.
