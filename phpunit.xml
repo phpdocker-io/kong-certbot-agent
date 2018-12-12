@@ -21,7 +21,8 @@
 
     <!-- Reports -->
     <logging>
-        <log type="coverage-html" target="reports/phpunit/coverage" lowUpperBound="85" highLowerBound="90" />
+        <log type="coverage-html" target="reports/phpunit" lowUpperBound="85" highLowerBound="90" />
+        <log type="coverage-clover" target="reports/phpunit/coverage.xml" lowUpperBound="85" highLowerBound="90" />
 
         <!-- For infection -->
         <log type="coverage-xml" target="reports/infection/coverage-xml"/>

@@ -36,6 +36,8 @@ jobs:
             path: code
             status: failure
 
+      - task: codecov
+        -
       - put: code
         params:
           path: code

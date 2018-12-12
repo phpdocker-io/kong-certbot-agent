@@ -13,6 +13,7 @@ phpdismod xdebug
 
 # Store in here any test artifacts
 mkdir /tmp/reports/
+ln -s /tmp/reports
 
 composer -o install
 
@@ -20,13 +21,7 @@ composer -o install
 vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
 
 # Run unit tests
-vendor/bin/phpunit --testdox
-
-# Placeholder for extracting coverage metric
-echo "fo" > /tmp/reports/phpunit
+php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
 
 # Run mutation tests
-vendor/bin/infection --initial-tests-php-options="-d zend_extension=xdebug.so" --threads=2 -s --min-msi=95 --min-covered-msi=95
-
-# Placeholder for extracting coverage metric
-echo "fa" > /tmp/reports/infection
+vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
