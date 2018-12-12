@@ -24,8 +24,8 @@ spec:
 # Make sure you edit your config below at the environment vars
 # Take note of the namespace below, and change as needed
 
-apiVersion: batch/v2alpha1
-kind: ScheduledJob
+apiVersion: batch/v1beta1
+kind: CronJob
 metadata:
   name: kong-certbot-agent
 spec:
@@ -40,7 +40,11 @@ spec:
           labels:
             app: kong-certbot
         spec:
-          restartPolicy: OnFailure
+          # Ensure certbot doesn't loop forever on fail to avoid exhausting your LE quotas in case of initial misconfiguration
+          completions: 1
+          backoffLimit: 0
+          restartPolicy: Never
+
           containers:
           - name: runtime
             image: phpdockerio/kong-certbot-agent:latest
