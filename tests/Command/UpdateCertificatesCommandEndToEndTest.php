@@ -80,16 +80,16 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             ->expects(self::once())
             ->method('request')
             ->with('post', $endpoint, self::callback(function (array $argument) {
-                self::assertArrayHasKey('form_params', $argument);
+                self::assertArrayHasKey('json', $argument);
 
                 // Cert values match fixtures
                 $expectedParams = [
                     'cert'   => "foo\n",
                     'key'    => "bar\n",
-                    'snis[]' => ['foo.bar'],
+                    'snis' => ['foo.bar'],
                 ];
 
-                self::assertEquals($expectedParams, $argument['form_params']);
+                self::assertEquals($expectedParams, $argument['json']);
 
                 return true;
             }))
@@ -134,19 +134,19 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
             ->expects(self::once())
             ->method('request')
             ->with('post', $endpoint, self::callback(function (array $argument) {
-                self::assertArrayHasKey('form_params', $argument);
+                self::assertArrayHasKey('json', $argument);
 
                 // Cert values match fixtures
                 $expectedParams = [
                     'cert'   => "foo\n",
                     'key'    => "bar\n",
-                    'snis[]' => [
+                    'snis' => [
                         'foo.bar',
                         'lalala.com',
                     ],
                 ];
 
-                self::assertEquals($expectedParams, $argument['form_params']);
+                self::assertEquals($expectedParams, $argument['json']);
 
                 return true;
             }))

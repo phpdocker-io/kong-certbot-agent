@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PhpDockerIo\KongCertbot\Kong;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use PhpDockerIo\KongCertbot\Certificate;
 
@@ -40,29 +41,29 @@ class Handler
     public function store(Certificate $certificate, string $kongAdminUri): bool
     {
         $payload = [
-            'headers'     => [
+            'headers' => [
                 'accept' => 'application/json',
             ],
-            'form_params' => [
-                'cert'   => $certificate->getCert(),
-                'key'    => $certificate->getKey(),
-                'snis[]' => $certificate->getDomains(),
+            'json'    => [
+                'cert' => $certificate->getCert(),
+                'key'  => $certificate->getKey(),
+                'snis' => $certificate->getDomains(),
             ],
         ];
 
         // Unfortunately for us, PUT is not UPSERT
         try {
             $this->guzzle->request('post', \sprintf('%s/certificates', $kongAdminUri), $payload);
-        } catch (ClientException $ex) {
+        } catch (BadResponseException $ex) {
             // Update certificates only on conflict
             if ($this->isConflict($ex) === false) {
-                $this->errors[] = new Error($ex->getCode(), $certificate->getDomains(), $ex->getMessage());
+                $this->handleUnknownErrors($ex, $certificate);
 
                 return false;
             }
 
             // Remove SNIs from PATCH as we will be patching into each domain individually
-            unset($payload['form_params']['snis[]']);
+            unset($payload['json']['snis']);
 
             foreach ($certificate->getDomains() as $domain) {
                 try {
@@ -91,11 +92,11 @@ class Handler
     /**
      * Preexisting certificates can generate either a 409, or a 400 leaking from Kong's database with some stuff on it.
      *
-     * @param ClientException $ex
+     * @param BadResponseException $ex
      *
      * @return bool
      */
-    private function isConflict(ClientException $ex): bool
+    private function isConflict(BadResponseException $ex): bool
     {
         $response         = $ex->getResponse();
         $responseCode     = $response !== null ? $response->getStatusCode() : false;
@@ -116,5 +117,37 @@ class Handler
             default:
                 return false;
         }
+    }
+
+    /**
+     * Parses an unhandled guzzle bad response exception into an error object and adds to the list
+     *
+     * @param BadResponseException $ex
+     * @param Certificate          $certificate
+     */
+    private function handleUnknownErrors(BadResponseException $ex, Certificate $certificate): void
+    {
+        $request = $ex->getRequest();
+        $request->getBody()->rewind();
+
+        $response = $ex->getResponse();
+        $message  = $ex->getMessage();
+
+        if ($response === null) {
+            $message = 'empty response';
+        }
+
+        $responseCode = $ex->getResponse() !== null ? $ex->getResponse()->getStatusCode() : $ex->getCode();
+
+        $summary = \sprintf(
+            'Kong error %s: %s. Request method `%s`, headers %s, body %s',
+            $responseCode,
+            $message,
+            $request->getMethod(),
+            \json_encode($request->getHeaders()),
+            \json_encode($request->getBody()->getContents())
+        );
+
+        $this->errors[] = new Error($responseCode, $certificate->getDomains(), $summary);
     }
 }
