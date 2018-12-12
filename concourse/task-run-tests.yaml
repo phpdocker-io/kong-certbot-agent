@@ -4,8 +4,10 @@ inputs:
   - name: code
 
 outputs:
-  - name: reports
-    path: /tmp/reports
+  - name: coverage-reports
+
+params:
+  CODECOV_TOKEN:
 
 image_resource:
   type: docker-image

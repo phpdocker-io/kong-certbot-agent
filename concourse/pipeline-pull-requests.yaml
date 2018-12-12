@@ -29,16 +29,18 @@ jobs:
 
       - task: run tests
         file: code/concourse/task-run-tests.yaml
-
         on_failure:
           put: code
           params:
             path: code
             status: failure
 
-      - task: codecov
-        -
       - put: code
         params:
           path: code
           status: success
+
+      - task: code coverage reports
+        params:
+          CODECOV_TOKEN: {{codecov-token}}
+        file: code/concourse/task-codecov.yaml

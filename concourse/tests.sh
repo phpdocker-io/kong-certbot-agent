@@ -3,17 +3,16 @@
 # Ensure we exit with failure if anything here fails
 set -e
 
+INITIAL_FOLDER=`pwd`
+
 # cd into the codebase, as per CI source
 cd code
+mkdir reports
 
 # Install xdebug & disable
 apt-get update
 apt-get install -y php-xdebug
 phpdismod xdebug
-
-# Store in here any test artifacts
-mkdir /tmp/reports/
-ln -s /tmp/reports
 
 composer -o install
 
@@ -25,3 +24,9 @@ php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
 
 # Run mutation tests
 vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
+
+# Go back to initial working dir to allow outputs to function
+cd ${INITIAL_FOLDER}
+
+# Copy reports to output
+cp code/reports/* coverage-reports/ -Rf
