@@ -3,16 +3,16 @@
 # Ensure we exit with failure if anything here fails
 set -e
 
+INITIAL_FOLDER=`pwd`
+
 # cd into the codebase, as per CI source
 cd code
+mkdir reports
 
 # Install xdebug & disable
 apt-get update
 apt-get install -y php-xdebug
 phpdismod xdebug
-
-# Store in here any test artifacts
-mkdir /tmp/reports/
 
 composer -o install
 
@@ -20,13 +20,13 @@ composer -o install
 vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
 
 # Run unit tests
-vendor/bin/phpunit --testdox
-
-# Placeholder for extracting coverage metric
-echo "fo" > /tmp/reports/phpunit
+php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
 
 # Run mutation tests
-vendor/bin/infection --initial-tests-php-options="-d zend_extension=xdebug.so" --threads=2 -s --min-msi=95 --min-covered-msi=95
+vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
 
-# Placeholder for extracting coverage metric
-echo "fa" > /tmp/reports/infection
+# Go back to initial working dir to allow outputs to function
+cd ${INITIAL_FOLDER}
+
+# Copy reports to output
+cp code/reports/* coverage-reports/ -Rf

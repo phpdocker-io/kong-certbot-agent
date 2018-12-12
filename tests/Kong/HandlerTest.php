@@ -53,10 +53,10 @@ class HandlerTest extends TestCase
                 'headers'     => [
                     'accept' => 'application/json',
                 ],
-                'form_params' => [
+                'json' => [
                     'cert'   => 'foo',
                     'key'    => 'bar',
-                    'snis[]' => ['foo.bar'],
+                    'snis' => ['foo.bar'],
                 ],
             ])
             ->willReturn($response);
@@ -81,10 +81,10 @@ class HandlerTest extends TestCase
                 'headers'     => [
                     'accept' => 'application/json',
                 ],
-                'form_params' => [
+                'json' => [
                     'cert'   => 'foo',
                     'key'    => 'bar',
-                    'snis[]' => ['foo.bar', 'bar.foo', 'doom.bar'],
+                    'snis' => ['foo.bar', 'bar.foo', 'doom.bar'],
                 ],
             ])
             ->willReturn($response);
@@ -101,7 +101,15 @@ class HandlerTest extends TestCase
     {
         $domains      = ['foo.bar', 'bar.foo', 'doom.bar'];
         $certificate  = new Certificate('foo', 'bar', $domains);
-        $errorMessage = 'foobar';
+
+        $expectedErrorMessage = \sprintf(
+            'Kong error %s: foobar. Request method `post`, headers {"content-type":"application\/json"}, body "[\"foo\"]"',
+            $statusCode
+        );
+
+        $exceptionMessage = 'foobar';
+
+        $headers = ['content-type' => 'application/json'];
 
         /** @var RequestInterface|MockObject $request */
         $request = $this->getMockBuilder(RequestInterface::class)->getMock();
@@ -131,7 +139,22 @@ class HandlerTest extends TestCase
             ->method('getContents')
             ->willReturn(\json_encode(['foo']));
 
-        $exception = new ClientException($errorMessage, $request, $response);
+        $request
+            ->expects(self::any())
+            ->method('getBody')
+            ->willReturn($body);
+
+        $request
+            ->expects(self::any())
+            ->method('getHeaders')
+            ->willReturn($headers);
+
+        $request
+            ->expects(self::any())
+            ->method('getMethod')
+            ->willReturn('post');
+
+        $exception = new ClientException($exceptionMessage, $request, $response);
 
         $this->httpClient
             ->expects(self::once())
@@ -139,7 +162,7 @@ class HandlerTest extends TestCase
             ->willThrowException($exception);
 
         $expectedErrors = [
-            new Error($statusCode, $domains, $errorMessage),
+            new Error($statusCode, $domains, $expectedErrorMessage),
         ];
 
         self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
@@ -161,12 +184,43 @@ class HandlerTest extends TestCase
     {
         $domains      = ['foo.bar', 'bar.foo', 'doom.bar'];
         $certificate  = new Certificate('foo', 'bar', $domains);
-        $errorMessage = 'lalala';
+
+        $expectedErrorMessage = \sprintf(
+            'Kong error %s: empty response. Request method `post`, headers {"content-type":"application\/json"}, body "[\"foo\"]"',
+            0
+        );
+
+        $exceptionMessage = 'foobar';
+
+        $headers = ['content-type' => 'application/json'];
 
         /** @var RequestInterface|MockObject $request */
         $request = $this->getMockBuilder(RequestInterface::class)->getMock();
 
-        $exception = new ClientException($errorMessage, $request, null);
+        /** @var StreamInterface|MockObject $body */
+        $body = $this->getMockBuilder(StreamInterface::class)->getMock();
+
+        $body
+            ->expects(self::any())
+            ->method('getContents')
+            ->willReturn(\json_encode(['foo']));
+
+        $request
+            ->expects(self::any())
+            ->method('getBody')
+            ->willReturn($body);
+
+        $request
+            ->expects(self::any())
+            ->method('getHeaders')
+            ->willReturn($headers);
+
+        $request
+            ->expects(self::any())
+            ->method('getMethod')
+            ->willReturn('post');
+
+        $exception = new ClientException($exceptionMessage, $request, null);
 
         $this->httpClient
             ->expects(self::once())
@@ -174,7 +228,7 @@ class HandlerTest extends TestCase
             ->willThrowException($exception);
 
         $expectedErrors = [
-            new Error(0, $domains, $errorMessage),
+            new Error(0, $domains, $expectedErrorMessage),
         ];
 
         self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
@@ -205,7 +259,7 @@ class HandlerTest extends TestCase
                 'headers'     => [
                     'accept' => 'application/json',
                 ],
-                'form_params' => [
+                'json' => [
                     'cert' => 'foo',
                     'key'  => 'bar',
                 ],
@@ -255,7 +309,7 @@ class HandlerTest extends TestCase
                 'headers'     => [
                     'accept' => 'application/json',
                 ],
-                'form_params' => [
+                'json' => [
                     'cert' => 'foo',
                     'key'  => 'bar',
                 ],
@@ -328,7 +382,7 @@ JSON;
                     'headers'     => [
                         'accept' => 'application/json',
                     ],
-                    'form_params' => [
+                    'json' => [
                         'cert' => 'foo',
                         'key'  => 'bar',
                     ],
