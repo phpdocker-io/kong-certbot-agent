@@ -40,3 +40,8 @@ jobs:
 
       - put: master-status
         params: { state: "success", commit: "code" }
+
+      - task: code coverage reports
+        params:
+          CODECOV_TOKEN: {{codecov-token}}
+        file: code/concourse/task-codecov.yaml
