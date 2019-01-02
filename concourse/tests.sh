@@ -23,7 +23,7 @@ vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHP
 php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
 
 # Run mutation tests
-vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
+vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=100 --min-covered-msi=100
 
 # Go back to initial working dir to allow outputs to function
 cd ${INITIAL_FOLDER}
