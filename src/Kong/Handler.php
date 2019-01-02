@@ -102,14 +102,13 @@ class Handler
         $responseCode     = $response !== null ? $response->getStatusCode() : null;
         $responseContents = $response !== null ? $response->getBody()->getContents() : '';
 
-        switch (true) {
-            case $response === null:
-                return false;
-
-            case $responseCode === 409:
+        switch ($responseCode) {
+            case 409:
                 return true;
 
-            case $responseCode === 400:
+            // In newer versions of Kong, a database primary key conflict error kinda leaks back in the response and
+            // with a 400 error code
+            case 400:
                 $decoded = json_decode($responseContents);
 
                 return \preg_match('/already associated with existing certificate/', $decoded->message ?? '') > 0;
