@@ -127,9 +127,7 @@ class Handler
      */
     private function handleUnknownErrors(BadResponseException $ex, Certificate $certificate): void
     {
-        $request = $ex->getRequest();
-        $request->getBody()->rewind();
-
+        $request  = $ex->getRequest();
         $response = $ex->getResponse();
         $message  = $ex->getMessage();
 
