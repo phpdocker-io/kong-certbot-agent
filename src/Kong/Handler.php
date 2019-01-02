@@ -99,7 +99,7 @@ class Handler
     private function isConflict(BadResponseException $ex): bool
     {
         $response         = $ex->getResponse();
-        $responseCode     = $response !== null ? $response->getStatusCode() : false;
+        $responseCode     = $response !== null ? $response->getStatusCode() : null;
         $responseContents = $response !== null ? $response->getBody()->getContents() : '';
 
         switch (true) {
