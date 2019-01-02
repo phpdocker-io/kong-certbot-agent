@@ -14,6 +14,11 @@
     "mutators": {
         "@default": true,
         "IdenticalEqual": false,
-        "NotIdenticalNotEqual": false
+        "NotIdenticalNotEqual": false,
+        "FalseValue": {
+            "ignore": [
+                "PhpDockerIo\\KongCertbot\\Certbot\\Handler::acquireCertificate"
+            ]
+        }
     }
 }
