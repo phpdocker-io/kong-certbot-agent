@@ -9,7 +9,7 @@
   "license": "MIT",
   "require":  {
     "ext-json":          "*",
-    "php":               "^7.1",
+    "php":               "^7.3",
     "ext-curl":          "*",
     "guzzlehttp/guzzle": "^6.3",
     "symfony/console":   "^4.0"
