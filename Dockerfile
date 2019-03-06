@@ -1,5 +1,5 @@
 FROM phpdockerio/php73-cli
-MAINTAINER http://phpdocker.io
+MAINTAINER https://phpdocker.io
 
 WORKDIR /workdir
 
