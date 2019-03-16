@@ -62,7 +62,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
     {
         $email    = 'foo@bar.com';
         $domains  = self::MAIN_DOMAIN;
-        $endpoint = self::KONG_ENDPOINT . '/certificates';
+        $endpoint = self::KONG_ENDPOINT . '/certificates/' . self::MAIN_DOMAIN;
 
         $expectedCertbotCommand = sprintf(
             'certbot certonly  --agree-tos --standalone --preferred-challenges http -n -m %s --expand -d %s',
@@ -79,7 +79,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
         $this->httpClient
             ->expects(self::once())
             ->method('request')
-            ->with('post', $endpoint, self::callback(function (array $argument) {
+            ->with('put', $endpoint, self::callback(function (array $argument) {
                 self::assertArrayHasKey('json', $argument);
 
                 // Cert values match fixtures
@@ -115,7 +115,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
         $secondDomain = 'lalala.com';
         $email        = 'foo@bar.com';
         $domains      = self::MAIN_DOMAIN . ',' . $secondDomain;
-        $endpoint     = self::KONG_ENDPOINT . '/certificates';
+        $endpoint     = self::KONG_ENDPOINT . '/certificates/' . self::MAIN_DOMAIN;
 
         $expectedCertbotCommand = sprintf(
             'certbot certonly --test-cert --agree-tos --standalone --preferred-challenges http -n -m %s --expand -d %s -d %s',
@@ -133,7 +133,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
         $this->httpClient
             ->expects(self::once())
             ->method('request')
-            ->with('post', $endpoint, self::callback(function (array $argument) {
+            ->with('put', $endpoint, self::callback(function (array $argument) {
                 self::assertArrayHasKey('json', $argument);
 
                 // Cert values match fixtures
