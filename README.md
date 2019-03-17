@@ -135,7 +135,7 @@ Due to the way certbot agent works, this will never be supported by the agent.
 
 ### Any considerations on a first time set up?
 
-Yes. Certbot has a limit of 50 certificate requests per hostname per week - it is very easy to go over this limit during
+Yes. Certbot has a limit of [50 certificate requests per domain per week](https://letsencrypt.org/docs/rate-limits/) - it is very easy to go over this limit during
 your initial set up while you manage to get all your stuff lined up together nicely:
   
   * Use test certs initially, allowances are more generous. You can modify the command to `command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)", "--test-cert" ]` until you have everything right.
@@ -145,7 +145,7 @@ your initial set up while you manage to get all your stuff lined up together nic
 
 ### How often should I renew my certs?
 
-By default, certbot has a limit of 50 certificate requests, so bear this in mind. Also, certs are good for 3 months. Let's Encrypt themselves recommend once every 60 days. [The example kubernetes cronjob](kubernetes/certbot-cronjob.yml)
+By default, certbot has a limit of 50 certificate requests per domain per week as mentioned earlier, so bear this in mind. Also, certs are good for 3 months. Let's Encrypt themselves recommend once every 60 days. [The example kubernetes cronjob](kubernetes/certbot-cronjob.yml)
 is setup like so. 
 
 You can certainly do it more often, but there's no point in spamming Let's Encrypt with extra requests - remember this is a shared resource, free as in freedom and beer, and someone surely pays for it. Be considerate.
