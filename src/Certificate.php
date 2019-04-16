@@ -23,6 +23,11 @@ class Certificate
      */
     private $domains;
 
+    /**
+     * @param string $cert
+     * @param string $key
+     * @param string[]  $domains
+     */
     public function __construct(string $cert, string $key, array $domains)
     {
         if (\trim($cert) === '') {
