@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\PhpDockerIo\KongCertbot\Certbot;
 
 use PhpDockerIo\KongCertbot\Certbot\Error;
+use PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException;
 use PhpDockerIo\KongCertbot\Certbot\Handler;
 use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Certificate;
@@ -26,7 +27,7 @@ class HandlerTest extends TestCase
 
     private $tmpCertPath = '/tmp/foo.bar';
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +39,7 @@ class HandlerTest extends TestCase
         \mkdir($this->tmpCertPath);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -59,10 +60,10 @@ class HandlerTest extends TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
      */
     public function acquireCertificateHandlesEmptyListOfDomains(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->handler->acquireCertificate([], 'foo', true);
     }
 
@@ -105,8 +106,6 @@ class HandlerTest extends TestCase
 
     /**
      * @test
-     * @expectedException \PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException
-     * @expectedExceptionMessageRegExp /fullchain\.pem/
      */
     public function acquireCertificatesHandlesMissingFullChain(): void
     {
@@ -120,6 +119,9 @@ class HandlerTest extends TestCase
             ->method('exec')
             ->willReturn(true);
 
+        $this->expectException(CertFileNotFoundException::class);
+        $this->expectExceptionMessageRegExp('/fullchain\.pem/');
+
         $handler = new Handler($this->shellExec);
         $handler
             ->setCertsBasePath('/tmp')
@@ -128,8 +130,6 @@ class HandlerTest extends TestCase
 
     /**
      * @test
-     * @expectedException \PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException
-     * @expectedExceptionMessageRegExp /privkey\.pem/
      */
     public function acquireCertificatesHandlesMissingPrivKey(): void
     {
@@ -142,6 +142,9 @@ class HandlerTest extends TestCase
             ->expects(self::once())
             ->method('exec')
             ->willReturn(true);
+
+        $this->expectException(CertFileNotFoundException::class);
+        $this->expectExceptionMessageRegExp('/privkey\.pem/');
 
         $handler = new Handler($this->shellExec);
         $handler
