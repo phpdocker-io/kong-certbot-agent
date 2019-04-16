@@ -41,7 +41,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
      */
     private $command;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -103,8 +103,8 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar', $output);
-        self::assertContains('Certificate for foo.bar correctly sent to Kong', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar', $output);
+        self::assertStringContainsString('Certificate for foo.bar correctly sent to Kong', $output);
     }
 
     /**
@@ -161,7 +161,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, lalala.com', $output);
-        self::assertContains('Certificates for foo.bar, lalala.com correctly sent to Kong', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, lalala.com', $output);
+        self::assertStringContainsString('Certificates for foo.bar, lalala.com correctly sent to Kong', $output);
     }
 }

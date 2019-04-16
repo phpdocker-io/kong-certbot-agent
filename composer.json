@@ -15,9 +15,9 @@
     "symfony/console":   "^4.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.3",
-    "infection/infection": "^0.10.5",
+    "phpunit/phpunit": "^8.0",
+    "infection/infection": "^0.11.0",
     "symfony/var-dumper": "^4.1",
-    "phpstan/phpstan": "^0.10.6"
+    "phpstan/phpstan": "^0.11.0"
   }
 }

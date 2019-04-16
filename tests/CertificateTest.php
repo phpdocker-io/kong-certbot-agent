@@ -10,33 +10,38 @@ class CertificateTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Empty cert
-     * @dataProvider             emptyStringsDataProvider
+     *
+     * @dataProvider emptyStringsDataProvider
      */
     public function constructorHandlesEmptyCert(string $emptyString): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Empty cert');
+
         new Certificate($emptyString, 'foo', ['bar']);
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Empty key
-     * @dataProvider             emptyStringsDataProvider
+     *
+     * @dataProvider emptyStringsDataProvider
      */
     public function constructorHandlesEmptyKey(string $emptyString): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Empty key');
+
         new Certificate('foo', $emptyString, ['bar']);
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Empty domains
      */
     public function constructorHandlesEmptyListOfDomains(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Empty domains');
+
         new Certificate('bar', 'foo', []);
     }
 

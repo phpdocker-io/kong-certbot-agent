@@ -31,7 +31,7 @@ class UpdateCertificatesCommandTest extends TestCase
      */
     private $command;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -70,10 +70,9 @@ class UpdateCertificatesCommandTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
-        self::assertContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertStringContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
     }
-
 
     /**
      * @test
@@ -107,8 +106,8 @@ class UpdateCertificatesCommandTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
-        self::assertContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertStringContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
     }
 
     /**
@@ -149,9 +148,9 @@ class UpdateCertificatesCommandTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
-        self::assertNotContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
-        self::assertContains('Kong error: code 1, message bar, domains foo.bar, bar.foo', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertStringNotContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+        self::assertStringContainsString('Kong error: code 1, message bar, domains foo.bar, bar.foo', $output);
     }
 
     /**
@@ -189,9 +188,9 @@ class UpdateCertificatesCommandTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
-        self::assertNotContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
-        self::assertContains('Certbot error: command status 1, output `["doom"]`, domains foo.bar, bar.foo', $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertStringNotContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+        self::assertStringContainsString('Certbot error: command status 1, output `["doom"]`, domains foo.bar, bar.foo', $output);
     }
 
     /**
@@ -227,20 +226,21 @@ class UpdateCertificatesCommandTest extends TestCase
 
         $output = $this->command->getDisplay();
 
-        self::assertContains('Updating certificates config for foo.bar, bar.foo', $output);
-        self::assertNotContains('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
-        self::assertContains(CertFileNotFoundException::class, $output);
+        self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
+        self::assertStringNotContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
+        self::assertStringContainsString(CertFileNotFoundException::class, $output);
     }
 
     /**
      * @test
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid email
-     * @dataProvider             invalidEmailsDataProvider
+     * @dataProvider invalidEmailsDataProvider
      */
     public function executeFailsOnInvalidEmail(string $invalidEmail): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid email');
+
         self::assertSame(1, $this->command->execute([
             'email'         => $invalidEmail,
             'domains'       => 'foo.bar',
@@ -261,12 +261,13 @@ class UpdateCertificatesCommandTest extends TestCase
     /**
      * @test
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid kong admin endpoint
-     * @dataProvider             invalidKongEndpointsDataProvider
+     * @dataProvider invalidKongEndpointsDataProvider
      */
     public function executeFailsOnInvalidKongAdminUri(string $invalidKongEndpoint): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid kong admin endpoint');
+
         self::assertSame(1, $this->command->execute([
             'email'         => 'foo@Bar.com',
             'domains'       => 'foo.bar',
@@ -287,11 +288,11 @@ class UpdateCertificatesCommandTest extends TestCase
     /**
      * @test
      *
-     * @expectedException \InvalidArgumentException
      * @dataProvider invalidListOfDomains
      */
     public function executeFailsOnInvalidListOfDomains(string $domains, string $expectedExceptionMessage): void
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         self::assertSame(1, $this->command->execute([
