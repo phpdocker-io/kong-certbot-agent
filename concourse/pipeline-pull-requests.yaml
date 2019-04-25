@@ -15,14 +15,15 @@ resources:
       disable_ci_skip: false
 
 jobs:
-  - name: Run tests
+  - name: analyze-pr
     public: true
     plan:
       - get: code
         trigger: true
         version: every
 
-      - put: code
+      - put: notify-pr-being-built
+        resource: code
         params:
           path: code
           status: pending
@@ -35,7 +36,8 @@ jobs:
             path: code
             status: failure
 
-      - put: code
+      - put: notify-pr-success
+        resource: code
         params:
           path: code
           status: success
