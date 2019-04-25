@@ -22,13 +22,14 @@ resources:
       access_token: {{github-access-token}}
 
 jobs:
-  - name: Run tests
+  - name: analyze-master
     public: true
     plan:
       - get: code
         trigger: true
 
-      - put: master-status
+      - put: notify-master-being-built
+        resource: master-status
         params: { state: "pending", commit: "code" }
 
       - task: run tests
@@ -38,7 +39,8 @@ jobs:
           put: master-status
           params: { state: "failure", commit: "code" }
 
-      - put: master-status
+      - put: notify-build-success
+        resource: master-status
         params: { state: "success", commit: "code" }
 
       - task: code coverage reports
