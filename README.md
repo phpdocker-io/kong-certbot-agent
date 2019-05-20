@@ -1,4 +1,4 @@
-[![Build status](https://ci.auronconsulting.co.uk/api/v1/teams/main/pipelines/kong-certbot-agent-master/jobs/Run%20tests/badge)](https://ci.auronconsulting.co.uk/teams/main/pipelines/kong-certbot-agent-master)
+[![Build status](https://ci.auronconsulting.co.uk/api/v1/teams/main/pipelines/kong-certbot-agent-master/jobs/analyze-master/badge)](https://ci.auronconsulting.co.uk/teams/main/pipelines/kong-certbot-agent-master)
 [![Code coverage](https://codecov.io/gh/luispabon/kong-certbot-agent/branch/master/graph/badge.svg)](https://codecov.io/gh/luispabon/kong-certbot-agent)
 
 # Kong Certbot agent
