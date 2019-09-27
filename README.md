@@ -13,10 +13,10 @@ There's an example [kubernetes cronjob](kubernetes/certbot-cronjob.yml) you can 
 
 ## Compatibility
 
-  * Kong >= 1.0: use Kong Certbot Agent 3.x. (container does not contain cron and crontab)
-  * Kong >= 0.14: use Kong Certbot Agent 2.x. (container contains cron and crontab)
-  * Kong <= 0.13: use Kong Certbot Agent 1.x.
-  
+  * Kong Certbot Agent 3.x: compatible with Kong 0.14 and 1.x. Kubernetes examples compatible with Kubernetes >= 1.8
+  * Kong Certbot Agent 2.x: compatible with Kong 0.14 and 1.x.  Kubernetes examples compatible with Kubernetes <= 1.8
+  * Kong Certbot Agent 1.x: compatible with Kong <= 0.13.  Kubernetes examples compatible with Kubernetes <= 1.8
+
 ## How to
 
 ### Run the container
