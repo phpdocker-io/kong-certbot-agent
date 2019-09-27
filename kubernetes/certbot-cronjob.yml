@@ -22,6 +22,8 @@ spec:
 ---
 
 # Make sure you edit your config below at the environment vars
+# Ensures certbot doesn't loop forever on fail to avoid exhausting your LE quotas in case of initial misconfiguration
+
 
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -33,31 +35,29 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      completions: 1
+      backoffLimit: 0
       template:
         # Matches selector on service above
         metadata:
           labels:
             app: kong-certbot
         spec:
-          # Ensure certbot doesn't loop forever on fail to avoid exhausting your LE quotas in case of initial misconfiguration
-          completions: 1
-          backoffLimit: 0
           restartPolicy: Never
-
           containers:
-          - name: runtime
-            image: phpdockerio/kong-certbot-agent:latest
-            command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
-            ports:
-            - name: web
-              containerPort: 80
-              protocol: TCP
-            env:
-              - name: TERM
-                value: linux
-              - name: KONG_ENDPOINT
-                value: http://base.path.to.kong.admin:8001
-              - name: EMAIL
-                value: letsencrypt@registration.email
-              - name: DOMAINS
-                value: comma.separated,list.of,domains.and.subdomains
+            - name: runtime
+              image: phpdockerio/kong-certbot-agent:3.0.0
+              command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
+              ports:
+                - name: web
+                  containerPort: 80
+                  protocol: TCP
+              env:
+                - name: TERM
+                  value: linux
+                - name: KONG_ENDPOINT
+                  value: http://base.path.to.kong.admin:8001
+                - name: EMAIL
+                  value: letsencrypt@registration.email
+                - name: DOMAINS
+                  value: comma.separated,list.of,domains.and.subdomains
