@@ -10,7 +10,7 @@ resources:
   - name: code
     type: pull-request
     source:
-      repository: luispabon/kong-certbot-agent
+      repository: phpdocker-io/kong-certbot-agent
       access_token: {{github-access-token}}
       disable_ci_skip: false
 
