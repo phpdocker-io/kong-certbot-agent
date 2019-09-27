@@ -17,16 +17,14 @@ ENV DOMAINS=foo.com,www.foo.com,bar.foo.com
 RUN  echo "deb http://ppa.launchpad.net/certbot/certbot/ubuntu bionic main" > /etc/apt/sources.list.d/letsencrypt.list \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7BF576066ADA65728FC7E70A8C47BE8E75BCA694 \
     && apt-get update \
-    && apt-get -y --no-install-recommends install nano cron certbot \
+    && apt-get -y --no-install-recommends install nano certbot \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Composer config - add early to benefit from docker build caches
 COPY composer.* /workdir/
 RUN composer -o install --no-dev
 
-# App and crontab
 COPY . /workdir/
-RUN ln -s /workdir/crontab /var/spool/cron/crontabs/root
 
 # Expose HTTP/HTTPS ports for certbot standalone
 EXPOSE 80 443
