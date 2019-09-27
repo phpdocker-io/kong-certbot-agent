@@ -89,13 +89,11 @@ Then, associate this route to it:
 
 ## Kubernetes
 
-Head off to the [Kubernetes deployment configuration](kubernetes) for examples, using a Kubernetes service
-plus either a [deployment (deprecated)](kubernetes/certbot-cron.yml), or a [kubernetes cronjob](kubernetes/certbot-cronjob.yml). 
+Here's a [kubernetes cronjob example](kubernetes/certbot-cronjob.yml).
 
-Note that the cron deployment is legacy stuff, from before Kubernetes had `CronJob` (pre 1.4). Please use a proper kubernetes
-`CronJob` object for scheduling.
+### Note
 
-Note: your k8s service will always time out since there's nothing listening on HTTP except for when certbot itself is 
+Your k8s service SHOULD always time out since there's nothing listening on HTTP except for when certbot itself is 
 running and requesting certs from LE.
 
 ## Command line tool
@@ -127,12 +125,13 @@ docker run -it --rm phpdockerio/kong-certbot-agent \
 
 You can give the agent a pretty big list of domains to acquire certificates for (100), but bear in mind it will be one certificate 
 shared among all of them. You might want to set up different cronjobs for different sets of certificates, grouped in a manner
-that makes sense to you.
+that makes sense to you. Also, if one of the domains you're getting a certificate from fails the HTTP challenge, cert acquisition
+for the whole group fails.
 
 ### How about wildcard certs?
 
 Unfortunately, certbot does not support http challenges on wildcard certs, needing to resort to other types (like DNS). 
-Due to the way certbot agent works, this will never be supported by the agent. 
+Due to the way certbot agent works, this will never be supported by the agent.
 
 ### Any considerations on a first time set up?
 
