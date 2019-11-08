@@ -21,6 +21,15 @@ resources:
       branch: master
       access_token: {{github-access-token}}
 
+  # Docker hub
+  - name: container-registry
+    type: docker-image
+    source:
+      email: {{docker-hub-email}}
+      username: {{docker-hub-user}}
+      password: {{docker-hub-password}}
+      repository: phpdockerio/kong-certbot-agent
+
 jobs:
   - name: analyze-master
     public: true
@@ -42,6 +51,12 @@ jobs:
       - put: notify-build-success
         resource: master-status
         params: { state: "success", commit: "code" }
+
+      - put: container-registry
+        params:
+          build: code
+          tag_as_latest: true
+          additional_tags: code/release
 
       - task: code coverage reports
         params:
