@@ -190,7 +190,8 @@ class UpdateCertificatesCommandTest extends TestCase
 
         self::assertStringContainsString('Updating certificates config for foo.bar, bar.foo', $output);
         self::assertStringNotContainsString('Certificates for foo.bar, bar.foo correctly sent to Kong', $output);
-        self::assertStringContainsString('Certbot error: command status 1, output `["doom"]`, domains foo.bar, bar.foo', $output);
+        self::assertStringContainsString('Certbot error: command status 1, output `["doom"]`, domains foo.bar, bar.foo',
+            $output);
     }
 
     /**
@@ -251,10 +252,10 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidEmailsDataProvider(): array
     {
         return [
-            ['no host' => '5'],
-            ['no fqdn' => 'foo@Bar'],
-            ['http url' => 'http://lalala.com'],
-            ['empty string' => ''],
+            'no host'      => ['5'],
+            'no fqdn'      => ['foo@Bar'],
+            'http url'     => ['http://lalala.com'],
+            'empty string' => [''],
         ];
     }
 
@@ -278,10 +279,10 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidKongEndpointsDataProvider(): array
     {
         return [
-            ['no host' => '5'],
-            ['email' => 'foo@Bar'],
-            ['no protocol' => 'lalala.com'],
-            ['empty string' => ''],
+            'no host'      => ['5'],
+            'email'        => ['foo@Bar'],
+            'no protocol'  => ['lalala.com'],
+            'empty string' => [''],
         ];
     }
 
@@ -305,8 +306,8 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidListOfDomains(): array
     {
         return [
-            ['', 'Empty list of domains given'],
-            ['  ,', 'Empty list of domains given'],
+            'empty string' => ['', 'Empty list of domains given'],
+            'comma separated spaces' => ['  ,', 'Empty list of domains given'],
         ];
     }
 }

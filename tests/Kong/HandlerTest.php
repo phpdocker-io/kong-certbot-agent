@@ -174,8 +174,8 @@ class HandlerTest extends TestCase
     public function unknownKongErrors(): array
     {
         return [
-            [400],
-            [500],
+            '400' => [400],
+            '500' => [500],
         ];
     }
 

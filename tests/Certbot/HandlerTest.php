@@ -184,8 +184,8 @@ class HandlerTest extends TestCase
     public function booleanDataProvider(): array
     {
         return [
-            ['true' => true],
-            ['false' => false],
+            'true' => [true],
+            'false' => [false],
         ];
     }
 

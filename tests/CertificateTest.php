@@ -48,14 +48,14 @@ class CertificateTest extends TestCase
     public function emptyStringsDataProvider(): array
     {
         return [
-            ['empty string' => ''],
-            ['space' => ' '],
-            ['tab' => '  '],
-            [
-                'newline' => '
+            'empty string' => [''],
+            'space'        => [' '],
+            'tab'          => ['  '],
+            'newline'      => [
+                '
             ',
             ],
-            ['many spaces' => '     '],
+            'many spaces' => ['     '],
         ];
     }
 }
