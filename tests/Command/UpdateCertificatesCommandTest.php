@@ -251,10 +251,10 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidEmailsDataProvider(): array
     {
         return [
-            ['5'],
-            ['foo@Bar'],
-            ['http://lalala.com'],
-            [''],
+            ['no host' => '5'],
+            ['no fqdn' => 'foo@Bar'],
+            ['http url' => 'http://lalala.com'],
+            ['empty string' => ''],
         ];
     }
 
@@ -278,10 +278,10 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidKongEndpointsDataProvider(): array
     {
         return [
-            ['5'],
-            ['foo@Bar'],
-            ['lalala.com'],
-            [''],
+            ['no host' => '5'],
+            ['email' => 'foo@Bar'],
+            ['no protocol' => 'lalala.com'],
+            ['empty string' => ''],
         ];
     }
 
