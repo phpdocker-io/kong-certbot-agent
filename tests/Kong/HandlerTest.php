@@ -97,7 +97,7 @@ class HandlerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider unknownKongErrors
+     * @dataProvider unknownKongErrorsDataProvider
      */
     public function storeHandlesUnknownKongError(int $statusCode): void
     {
@@ -171,11 +171,11 @@ class HandlerTest extends TestCase
         self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
-    public function unknownKongErrors(): array
+    public function unknownKongErrorsDataProvider(): array
     {
         return [
-            [400],
-            [500],
+            'http 400' => [400],
+            'http 500' => [500],
         ];
     }
 
