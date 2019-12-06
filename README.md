@@ -103,7 +103,7 @@ it, as it's done on the [kubernetes cronjob example](kubernetes/certbot-cronjob.
 
 ```bash
 # Get a certificate for three subdomains, and submit to kong
-docker run -it --rm
+docker run -it --rm \
     -e KONG_ENDPOINT=http://kong-admin:8001 \
     -e EMAIL=foo@bar.com \
     -e DOMAINS=bar.com,foo.bar.com,www.bar.com \
@@ -111,7 +111,7 @@ docker run -it --rm
 
 
 # Get a TEST certificate for three subdomains, and submit to kong
-docker run -it --rm
+docker run -it --rm \
     -e KONG_ENDPOINT=http://kong-admin:8001 \
     -e EMAIL=foo@bar.com \
     -e DOMAINS=bar.com,foo.bar.com,www.bar.com \
