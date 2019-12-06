@@ -27,13 +27,13 @@ There's an example [kubernetes cronjob](kubernetes/certbot-cronjob.yml) you can 
   - Deploy container in your environment.
   - It will automagically run the updater script every 24th of the month.
   - Profit!
-  
+
 ### Kong configuration
 
-In order for the challenge to work correctly, you need to open up a service and a route in Kong pointing to the container at a very 
-specific URL path. It MUST respond on every domain you're requesting certs for. 
+In order for the challenge to work correctly, you need to open up a service and a route in Kong pointing to the container at a very
+specific URL path. It MUST respond on every domain you're requesting certs for.
 
-When it comes the time to run certbot, it will open an HTTP server, put some stuff on a specific path, then ping 
+When it comes the time to run certbot, it will open an HTTP server, put some stuff on a specific path, then ping
 Let's Encrypt, which will attempt to read that from the domain requested. If successful, a certificate is generated.
 
 This is a service definition example in Kong admin:
@@ -93,7 +93,7 @@ Here's a [kubernetes cronjob example](kubernetes/certbot-cronjob.yml).
 
 ### Note
 
-Your k8s service SHOULD always time out since there's nothing listening on HTTP except for when certbot itself is 
+Your k8s service SHOULD always time out since there's nothing listening on HTTP except for when certbot itself is
 running and requesting certs from LE.
 
 ## Command line tool
@@ -103,19 +103,20 @@ it, as it's done on the [kubernetes cronjob example](kubernetes/certbot-cronjob.
 
 ```bash
 # Get a certificate for three subdomains, and submit to kong
-docker run -it --rm phpdockerio/kong-certbot-agent \
-    ./certbot-agent certs:update \
-    http://kong-admin:8001 \
-    foo@bar.com \
-    bar.com,foo.bar.com,www.bar.com
+docker run -it --rm
+    -e KONG_ENDPOINT=http://kong-admin:8001 \
+    -e EMAIL=foo@bar.com \
+    -e DOMAINS=bar.com,foo.bar.com,www.bar.com \
+    phpdockerio/kong-certbot-agent
+
 
 # Get a TEST certificate for three subdomains, and submit to kong
-docker run -it --rm phpdockerio/kong-certbot-agent \
-    ./certbot-agent certs:update \
-    --test-cert \
-    http://kong-admin:8001 \
-    foo@bar.com \
-    bar.com,foo.bar.com,www.bar.com
+docker run -it --rm
+    -e KONG_ENDPOINT=http://kong-admin:8001 \
+    -e EMAIL=foo@bar.com \
+    -e DOMAINS=bar.com,foo.bar.com,www.bar.com \
+    -e TEST_CERT=true \
+    phpdockerio/kong-certbot-agent
 
 ```
 
@@ -123,29 +124,29 @@ docker run -it --rm phpdockerio/kong-certbot-agent \
 
 ### How many domains can I get certs for?
 
-You can give the agent a pretty big list of domains to acquire certificates for (100), but bear in mind it will be one certificate 
+You can give the agent a pretty big list of domains to acquire certificates for (100), but bear in mind it will be one certificate
 shared among all of them. You might want to set up different cronjobs for different sets of certificates, grouped in a manner
 that makes sense to you. Also, if one of the domains you're getting a certificate from fails the HTTP challenge, cert acquisition
 for the whole group fails.
 
 ### How about wildcard certs?
 
-Unfortunately, certbot does not support http challenges on wildcard certs, needing to resort to other types (like DNS). 
+Unfortunately, certbot does not support http challenges on wildcard certs, needing to resort to other types (like DNS).
 Due to the way certbot agent works, this will never be supported by the agent.
 
 ### Any considerations on a first time set up?
 
 Yes. Certbot has a limit of [50 certificate requests per domain per week](https://letsencrypt.org/docs/rate-limits/) - it is very easy to go over this limit during
 your initial set up while you manage to get all your stuff lined up together nicely:
-  
+
   * Use test certs initially, allowances are more generous. You can modify the command to `command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)", "--test-cert" ]` until you have everything right.
   * Ensure your scheduling does not retry a failed command. It's very unlikely it will succeed a second time with the same parameters
-  and you'll go over the limit quicker than fast, especially in Kubernetes which by default will retry until your cluster goes down. The 
+  and you'll go over the limit quicker than fast, especially in Kubernetes which by default will retry until your cluster goes down. The
   [example kubernetes cronjob](kubernetes/certbot-cronjob.yml) specifically stops this from happening
 
 ### How often should I renew my certs?
 
 By default, certbot has a limit of 50 certificate requests per domain per week as mentioned earlier, so bear this in mind. Also, certs are good for 3 months. Let's Encrypt themselves recommend once every 60 days. [The example kubernetes cronjob](kubernetes/certbot-cronjob.yml)
-is setup like so. 
+is setup like so.
 
 You can certainly do it more often, but there's no point in spamming Let's Encrypt with extra requests - remember this is a shared resource, free as in freedom and beer, and someone surely pays for it. Be considerate.

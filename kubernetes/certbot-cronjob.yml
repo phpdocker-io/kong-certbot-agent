@@ -47,7 +47,6 @@ spec:
           containers:
             - name: runtime
               image: phpdockerio/kong-certbot-agent:3.0.0
-              command: [ "/workdir/certbot-agent", "certs:update", "$(KONG_ENDPOINT)", "$(EMAIL)", "$(DOMAINS)" ]
               ports:
                 - name: web
                   containerPort: 80
