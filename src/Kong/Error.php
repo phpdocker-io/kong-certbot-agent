@@ -13,18 +13,23 @@ class Error
     /**
      * @var int
      */
-    private $code;
+    private int $code;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $domains;
+    private array $domains;
 
     /**
      * @var string
      */
-    private $message;
+    private string $message;
 
+    /**
+     * @param int      $code
+     * @param string[] $domains
+     * @param string   $message
+     */
     public function __construct(int $code, array $domains, string $message)
     {
         $this->code    = $code;
@@ -41,7 +46,7 @@ class Error
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getDomains(): array
     {

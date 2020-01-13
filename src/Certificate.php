@@ -11,17 +11,17 @@ class Certificate
     /**
      * @var string
      */
-    private $cert;
+    private string $cert;
 
     /**
      * @var string
      */
-    private $key;
+    private string $key;
 
     /**
      * @var string[]
      */
-    private $domains;
+    private array $domains;
 
     /**
      * @param string $cert

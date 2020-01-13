@@ -12,9 +12,9 @@ namespace PhpDockerIo\KongCertbot\Certbot;
 class ShellExec
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $output;
+    private array $output;
 
     public function exec(string $command): bool
     {
@@ -28,7 +28,7 @@ class ShellExec
     /**
      * Returns the command output
      *
-     * @return array
+     * @return string[]
      */
     public function getOutput(): array
     {
