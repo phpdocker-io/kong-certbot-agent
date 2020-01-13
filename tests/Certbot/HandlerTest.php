@@ -120,7 +120,7 @@ class HandlerTest extends TestCase
             ->willReturn(true);
 
         $this->expectException(CertFileNotFoundException::class);
-        $this->expectExceptionMessageRegExp('/fullchain\.pem/');
+        $this->expectExceptionMessageMatches('/fullchain\.pem/');
 
         $handler = new Handler($this->shellExec);
         $handler
@@ -144,7 +144,7 @@ class HandlerTest extends TestCase
             ->willReturn(true);
 
         $this->expectException(CertFileNotFoundException::class);
-        $this->expectExceptionMessageRegExp('/privkey\.pem/');
+        $this->expectExceptionMessageMatches('/privkey\.pem/');
 
         $handler = new Handler($this->shellExec);
         $handler
