@@ -46,7 +46,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: runtime
-              image: phpdockerio/kong-certbot-agent:3.0.0
+              image: phpdockerio/kong-certbot-agent:3 # This will bring in latest 3.x release - we do follow semver so should be safe
               ports:
                 - name: web
                   containerPort: 80
