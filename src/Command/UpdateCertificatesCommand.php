@@ -30,12 +30,12 @@ class UpdateCertificatesCommand extends Command
     /**
      * @var Kong
      */
-    private $kong;
+    private Kong $kong;
 
     /**
      * @var Certbot
      */
-    private $certbot;
+    private Certbot $certbot;
 
     public function __construct(Kong $kong, Certbot $certbot, string $certsBasePath = null)
     {

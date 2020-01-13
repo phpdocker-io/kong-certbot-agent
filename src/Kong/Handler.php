@@ -18,12 +18,12 @@ class Handler
     /**
      * @var ClientInterface
      */
-    private $guzzle;
+    private ClientInterface $guzzle;
 
     /**
      * @var Error[]
      */
-    private $errors = [];
+    private array $errors = [];
 
     public function __construct(ClientInterface $guzzle)
     {

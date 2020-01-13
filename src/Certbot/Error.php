@@ -6,24 +6,24 @@ namespace PhpDockerIo\KongCertbot\Certbot;
 class Error
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $cmdOutput;
+    private array $cmdOutput;
 
     /**
      * @var int
      */
-    private $cmdStatus;
+    private int $cmdStatus;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $domains;
+    private array $domains;
 
     /**
      * @param string[] $cmdOutput
      * @param int      $cmdStatus
-     * @param array    $domains
+     * @param string[]    $domains
      */
     public function __construct(array $cmdOutput, int $cmdStatus, array $domains)
     {
@@ -49,7 +49,7 @@ class Error
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getDomains(): array
     {

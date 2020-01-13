@@ -9,15 +9,15 @@
   "license": "MIT",
   "require":  {
     "ext-json":          "*",
-    "php":               "^7.3",
+    "php":               "^7.4",
     "ext-curl":          "*",
     "guzzlehttp/guzzle": "^6.3",
-    "symfony/console":   "^4.4"
+    "symfony/console":   "^5.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.0",
-    "infection/infection": "^0.14.0",
-    "symfony/var-dumper": "^4.4",
-    "phpstan/phpstan": "^0.11.0"
+    "infection/infection": "^0.15.0",
+    "symfony/var-dumper": "^5.0",
+    "phpstan/phpstan": "^0.12.0"
   }
 }

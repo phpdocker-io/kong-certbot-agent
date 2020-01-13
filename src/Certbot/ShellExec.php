@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Certbot;
 
+use RuntimeException;
+
 /**
  * Runs a command on the shell.
  *
@@ -12,9 +14,9 @@ namespace PhpDockerIo\KongCertbot\Certbot;
 class ShellExec
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $output;
+    private array $output = [];
 
     public function exec(string $command): bool
     {
@@ -28,12 +30,12 @@ class ShellExec
     /**
      * Returns the command output
      *
-     * @return array
+     * @return string[]
      */
     public function getOutput(): array
     {
-        if ($this->output === null) {
-            throw new \RuntimeException('Command not yet run');
+        if ($this->output === []) {
+            throw new RuntimeException('Command not yet run');
         }
 
         return $this->output;

@@ -18,17 +18,17 @@ class Handler
     /**
      * @var Error[]
      */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * @var ShellExec
      */
-    private $shellExec;
+    private ShellExec $shellExec;
 
     /**
      * @var string
      */
-    private $certsBasePath;
+    private string $certsBasePath;
 
     public function __construct(ShellExec $shellExec)
     {
