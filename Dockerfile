@@ -1,4 +1,4 @@
-FROM phpdockerio/php73-cli
+FROM phpdockerio/php74-cli
 MAINTAINER https://phpdocker.io
 
 WORKDIR /workdir
