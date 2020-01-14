@@ -47,6 +47,7 @@ spec:
           containers:
             - name: runtime
               image: phpdockerio/kong-certbot-agent:3 # This will bring in latest 3.x release - we do follow semver so should be safe
+              imagePullPolicy: Always                 # Ensure you have this if you're not pinning to an exact major.minor.patch release
               ports:
                 - name: web
                   containerPort: 80
