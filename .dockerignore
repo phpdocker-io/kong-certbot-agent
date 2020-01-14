@@ -5,3 +5,10 @@ vendor
 .dockerignore
 reports
 tests
+credentials.*
+Dockerfile
+infection.json.dist
+phpunit.xml
+phpstan.neon
+concourse
+.phpunit.result.cache
