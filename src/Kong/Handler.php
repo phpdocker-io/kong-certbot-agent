@@ -5,7 +5,6 @@ namespace PhpDockerIo\KongCertbot\Kong;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
 use PhpDockerIo\KongCertbot\Certificate;
 
 /**
