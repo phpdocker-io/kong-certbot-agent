@@ -153,7 +153,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
         self::assertSame(0, $this->command->execute([
             'email'         => $email,
-            'domains'       => $secondDomain,
+            'domains'       => $domains,
             'kong-endpoint' => self::KONG_ENDPOINT,
             '--test-cert'   => true,
         ]));
