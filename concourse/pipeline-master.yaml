@@ -41,7 +41,7 @@ jobs:
         resource: master-status
         params: { state: "pending", commit: "code" }
 
-      - task: run tests
+      - task: run_tests
         file: code/concourse/task-run-tests.yaml
 
         on_failure:
@@ -58,7 +58,7 @@ jobs:
           tag_as_latest: true
           additional_tags: code/release
 
-      - task: code coverage reports
+      - task: code_coverage_reports
         params:
           CODECOV_TOKEN: {{codecov-token}}
         file: code/concourse/task-codecov.yaml

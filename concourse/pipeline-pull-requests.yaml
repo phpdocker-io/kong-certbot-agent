@@ -28,7 +28,7 @@ jobs:
           path: code
           status: pending
 
-      - task: run tests
+      - task: run_tests
         file: code/concourse/task-run-tests.yaml
         on_failure:
           put: code
@@ -42,7 +42,7 @@ jobs:
           path: code
           status: success
 
-      - task: code coverage reports
+      - task: code_coverage_reports
         params:
           CODECOV_TOKEN: {{codecov-token}}
         file: code/concourse/task-codecov.yaml
