@@ -61,14 +61,9 @@ class Handler
             );
         } catch (BadResponseException $ex) {
             $request  = $ex->getRequest();
-            $response = $ex->getResponse();
             $message  = $ex->getMessage();
 
-            if ($response === null) {
-                $message = 'empty response';
-            }
-
-            $responseCode = $ex->getResponse() !== null ? $ex->getResponse()->getStatusCode() : $ex->getCode();
+            $responseCode = $ex->getResponse()->getStatusCode() ?? $ex->getCode();
 
             $summary = \sprintf(
                 'Kong error %s: %s. Request method `%s`, headers %s, body %s',
