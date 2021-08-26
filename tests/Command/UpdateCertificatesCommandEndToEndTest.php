@@ -151,7 +151,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
                 return true;
             }))
-            ->willReturn(true);
+            ->willReturn($this->createMock(ResponseInterface::class));
 
         self::assertSame(0, $this->command->execute([
             'email'         => $email,
