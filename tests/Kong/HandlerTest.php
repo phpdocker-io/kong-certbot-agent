@@ -125,26 +125,21 @@ class HandlerTest extends TestCase
         $body = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $response
-            ->expects(self::any())
             ->method('getStatusCode')
             ->willReturn($statusCode);
 
         $response
-            ->expects(self::any())
             ->method('getBody')
             ->willReturn($body);
 
         $body
-            ->expects(self::any())
             ->method('rewind');
 
         $body
-            ->expects(self::any())
             ->method('getContents')
             ->willReturn(json_encode(['foo']));
 
         $request
-            ->expects(self::any())
             ->method('getBody')
             ->willReturn($body);
 

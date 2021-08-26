@@ -139,7 +139,6 @@ class UpdateCertificatesCommandTest extends TestCase
             ->willReturn(false);
 
         $this->kong
-            ->expects(self::any())
             ->method('getErrors')
             ->willReturn($kongErrors);
 
@@ -175,7 +174,6 @@ class UpdateCertificatesCommandTest extends TestCase
             ->willThrowException(new RuntimeException());
 
         $this->certbot
-            ->expects(self::any())
             ->method('getErrors')
             ->willReturn($certbotErrors);
 
@@ -214,7 +212,6 @@ class UpdateCertificatesCommandTest extends TestCase
             ->willThrowException($expectedException);
 
         $this->certbot
-            ->expects(self::any())
             ->method('getErrors')
             ->willReturn([]);
 
