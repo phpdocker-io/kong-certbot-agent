@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\PhpDockerIo\KongCertbot\Certbot;
 
+use InvalidArgumentException;
 use PhpDockerIo\KongCertbot\Certbot\Error;
 use PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException;
 use PhpDockerIo\KongCertbot\Certbot\Handler;
@@ -10,6 +11,14 @@ use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Certificate;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Throwable;
+use function file_exists;
+use function file_get_contents;
+use function mkdir;
+use function rmdir;
+use function sprintf;
+use function touch;
 
 class HandlerTest extends TestCase
 {
@@ -36,7 +45,7 @@ class HandlerTest extends TestCase
         $this->handler = new Handler($this->shellExec);
         $this->handler->setCertsBasePath($this->certsBasePath);
 
-        \mkdir($this->tmpCertPath);
+        mkdir($this->tmpCertPath);
     }
 
     public function tearDown(): void
@@ -44,17 +53,17 @@ class HandlerTest extends TestCase
         parent::tearDown();
 
         $fullChain = $this->tmpCertPath . '/fullchain.pem';
-        if (\file_exists($fullChain) === true) {
+        if (file_exists($fullChain) === true) {
             unlink($fullChain);
         }
 
         $privKey = $this->tmpCertPath . '/privkey.pem';
-        if (\file_exists($privKey) === true) {
+        if (file_exists($privKey) === true) {
             unlink($privKey);
         }
 
-        if (\file_exists($this->tmpCertPath) === true) {
-            \rmdir($this->tmpCertPath);
+        if (file_exists($this->tmpCertPath) === true) {
+            rmdir($this->tmpCertPath);
         }
     }
 
@@ -63,7 +72,7 @@ class HandlerTest extends TestCase
      */
     public function acquireCertificateHandlesEmptyListOfDomains(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->handler->acquireCertificate([], 'foo', true);
     }
 
@@ -96,11 +105,11 @@ class HandlerTest extends TestCase
 
         try {
             $this->handler->acquireCertificate($domains, $email, $testCert);
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             $exception = $ex;
         }
 
-        self::assertInstanceOf(\RuntimeException::class, $exception);
+        self::assertInstanceOf(RuntimeException::class, $exception);
         self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 
@@ -109,7 +118,7 @@ class HandlerTest extends TestCase
      */
     public function acquireCertificatesHandlesMissingFullChain(): void
     {
-        \touch($this->tmpCertPath . '/privkey.pem');
+        touch($this->tmpCertPath . '/privkey.pem');
 
         $domains = ['foo.bar'];
         $email   = 'foo@bar';
@@ -133,7 +142,7 @@ class HandlerTest extends TestCase
      */
     public function acquireCertificatesHandlesMissingPrivKey(): void
     {
-        \touch($this->tmpCertPath . '/fullchain.pem');
+        touch($this->tmpCertPath . '/fullchain.pem');
 
         $domains = ['foo.bar'];
         $email   = 'foo@bar';
@@ -162,8 +171,8 @@ class HandlerTest extends TestCase
         $email   = 'foo@bar';
 
         $expectedCertificate = new Certificate(
-            \file_get_contents(\sprintf('%s/%s/fullchain.pem', $this->certsBasePath, $domains[0])),
-            \file_get_contents(\sprintf('%s/%s/privkey.pem', $this->certsBasePath, $domains[0])),
+            file_get_contents(sprintf('%s/%s/fullchain.pem', $this->certsBasePath, $domains[0])),
+            file_get_contents(sprintf('%s/%s/privkey.pem', $this->certsBasePath, $domains[0])),
             $domains
         );
 

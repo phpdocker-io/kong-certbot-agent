@@ -13,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use function json_encode;
+use function sprintf;
 
 class HandlerTest extends TestCase
 {
@@ -104,7 +106,7 @@ class HandlerTest extends TestCase
         $domains     = ['foo.bar', 'bar.foo', 'doom.bar'];
         $certificate = new Certificate('foo', 'bar', $domains);
 
-        $expectedErrorMessage = \sprintf(
+        $expectedErrorMessage = sprintf(
             'Kong error %s: foobar. Request method `put`, headers {"content-type":"application\/json"}, body "[\"foo\"]"',
             $statusCode
         );
@@ -139,7 +141,7 @@ class HandlerTest extends TestCase
         $body
             ->expects(self::any())
             ->method('getContents')
-            ->willReturn(\json_encode(['foo']));
+            ->willReturn(json_encode(['foo']));
 
         $request
             ->expects(self::any())

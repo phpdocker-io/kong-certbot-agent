@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\PhpDockerIo\KongCertbot\Command;
 
+use InvalidArgumentException;
 use PhpDockerIo\KongCertbot\Certbot\Error as CertbotError;
 use PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
@@ -12,7 +13,9 @@ use PhpDockerIo\KongCertbot\Kong\Error as KongError;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
+use function implode;
 
 class UpdateCertificatesCommandTest extends TestCase
 {
@@ -64,7 +67,7 @@ class UpdateCertificatesCommandTest extends TestCase
 
         self::assertSame(0, $this->command->execute([
             'email'         => $email,
-            'domains'       => \implode(',', $domains),
+            'domains'       => implode(',', $domains),
             'kong-endpoint' => 'http://foobar',
         ]));
 
@@ -142,7 +145,7 @@ class UpdateCertificatesCommandTest extends TestCase
 
         self::assertSame(1, $this->command->execute([
             'email'         => $email,
-            'domains'       => \implode(',', $domains),
+            'domains'       => implode(',', $domains),
             'kong-endpoint' => 'http://foobar',
         ]));
 
@@ -169,7 +172,7 @@ class UpdateCertificatesCommandTest extends TestCase
             ->expects(self::once())
             ->method('acquireCertificate')
             ->with($domains, $email, false)
-            ->willThrowException(new \RuntimeException());
+            ->willThrowException(new RuntimeException());
 
         $this->certbot
             ->expects(self::any())
@@ -182,7 +185,7 @@ class UpdateCertificatesCommandTest extends TestCase
 
         self::assertSame(1, $this->command->execute([
             'email'         => $email,
-            'domains'       => \implode(',', $domains),
+            'domains'       => implode(',', $domains),
             'kong-endpoint' => 'http://foobar',
         ]));
 
@@ -221,7 +224,7 @@ class UpdateCertificatesCommandTest extends TestCase
 
         self::assertSame(1, $this->command->execute([
             'email'         => $email,
-            'domains'       => \implode(',', $domains),
+            'domains'       => implode(',', $domains),
             'kong-endpoint' => 'http://foobar',
         ]));
 
@@ -239,7 +242,7 @@ class UpdateCertificatesCommandTest extends TestCase
      */
     public function executeFailsOnInvalidEmail(string $invalidEmail): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid email');
 
         self::assertSame(1, $this->command->execute([
@@ -266,7 +269,7 @@ class UpdateCertificatesCommandTest extends TestCase
      */
     public function executeFailsOnInvalidKongAdminUri(string $invalidKongEndpoint): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid kong admin endpoint');
 
         self::assertSame(1, $this->command->execute([
@@ -293,7 +296,7 @@ class UpdateCertificatesCommandTest extends TestCase
      */
     public function executeFailsOnInvalidListOfDomains(string $domains, string $expectedExceptionMessage): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         self::assertSame(1, $this->command->execute([
