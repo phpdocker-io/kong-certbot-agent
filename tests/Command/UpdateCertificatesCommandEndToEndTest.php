@@ -13,7 +13,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-
 /**
  * End to end functional test.
  *
@@ -78,8 +77,8 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
                 // Cert values match fixtures
                 $expectedParams = [
-                    'cert'   => "foo\n",
-                    'key'    => "bar\n",
+                    'cert' => "foo\n",
+                    'key'  => "bar\n",
                     'snis' => ['foo.bar'],
                 ];
 
@@ -132,8 +131,8 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
                 // Cert values match fixtures
                 $expectedParams = [
-                    'cert'   => "foo\n",
-                    'key'    => "bar\n",
+                    'cert' => "foo\n",
+                    'key'  => "bar\n",
                     'snis' => [
                         'foo.bar',
                         'lalala.com',

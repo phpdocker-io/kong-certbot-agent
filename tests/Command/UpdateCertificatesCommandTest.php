@@ -299,7 +299,7 @@ class UpdateCertificatesCommandTest extends TestCase
     public function invalidListOfDomains(): array
     {
         return [
-            'empty string' => ['', 'Empty list of domains given'],
+            'empty string'           => ['', 'Empty list of domains given'],
             'comma separated spaces' => ['  ,', 'Empty list of domains given'],
         ];
     }

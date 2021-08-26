@@ -56,7 +56,7 @@ class CertificateTest extends TestCase
                 '
             ',
             ],
-            'many spaces' => ['     '],
+            'many spaces'  => ['     '],
         ];
     }
 }
