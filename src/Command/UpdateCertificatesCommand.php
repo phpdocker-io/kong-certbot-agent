@@ -138,6 +138,7 @@ class UpdateCertificatesCommand extends Command
         // exit appropriately for whatever orchestrator to realise there were problems
         if (count($this->kong->getErrors()) > 0 || count($this->certbot->getErrors()) > 0) {
             $this->reportErrors($this->kong->getErrors(), $this->certbot->getErrors(), $output);
+
             return 1;
         }
 
@@ -181,7 +182,6 @@ class UpdateCertificatesCommand extends Command
                 implode(', ', $kongError->getDomains())
             ));
         }
-
 
         foreach ($certbotErrors as $certbotError) {
             $output->writeln(sprintf(
