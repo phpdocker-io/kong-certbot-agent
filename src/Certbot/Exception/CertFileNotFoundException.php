@@ -15,7 +15,6 @@ use function sprintf;
 class CertFileNotFoundException extends RuntimeException
 {
     /**
-     * @param string   $file
      * @param string[] $domains
      */
     public function __construct(string $file, array $domains)

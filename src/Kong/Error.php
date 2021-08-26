@@ -11,35 +11,12 @@ namespace PhpDockerIo\KongCertbot\Kong;
 class Error
 {
     /**
-     * @var int
-     */
-    private int $code;
-
-    /**
-     * @var string[]
-     */
-    private array $domains;
-
-    /**
-     * @var string
-     */
-    private string $message;
-
-    /**
-     * @param int      $code
      * @param string[] $domains
-     * @param string   $message
      */
-    public function __construct(int $code, array $domains, string $message)
+    public function __construct(private int $code, private array $domains, private string $message)
     {
-        $this->code    = $code;
-        $this->domains = $domains;
-        $this->message = $message;
     }
 
-    /**
-     * @return int
-     */
     public function getCode(): int
     {
         return $this->code;
@@ -53,9 +30,6 @@ class Error
         return $this->domains;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;

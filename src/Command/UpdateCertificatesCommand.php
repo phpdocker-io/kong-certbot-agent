@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Command;
 
+use JsonException;
 use PhpDockerIo\KongCertbot\Certbot\Error as CertbotError;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Kong\Error as KongError;
@@ -36,22 +37,9 @@ class UpdateCertificatesCommand extends Command
 {
     private const COMMAND_NAME = 'certs:update';
 
-    /**
-     * @var Kong
-     */
-    private Kong $kong;
-
-    /**
-     * @var Certbot
-     */
-    private Certbot $certbot;
-
-    public function __construct(Kong $kong, Certbot $certbot, string $certsBasePath = null)
+    public function __construct(private Kong $kong, private Certbot $certbot, string $certsBasePath = null)
     {
         parent::__construct(self::COMMAND_NAME);
-
-        $this->kong    = $kong;
-        $this->certbot = $certbot;
 
         if ($certsBasePath !== null) {
             $this->certbot->setCertsBasePath($certsBasePath);
@@ -97,6 +85,7 @@ class UpdateCertificatesCommand extends Command
      * @return int
      *
      * @throws InvalidArgumentException
+     * @throws JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -159,8 +148,6 @@ class UpdateCertificatesCommand extends Command
      * Parses the list of domains given from the command line, cleans it up and returns it as an array
      * of individual domains.
      *
-     * @param string $concatDomains
-     *
      * @return string[]
      */
     private function parseDomains(string $concatDomains): array
@@ -179,9 +166,10 @@ class UpdateCertificatesCommand extends Command
     /**
      * List kong and certbot errors.
      *
-     * @param KongError[]     $kongErrors
-     * @param CertbotError[]  $certbotErrors
-     * @param OutputInterface $output
+     * @param KongError[]    $kongErrors
+     * @param CertbotError[] $certbotErrors
+     *
+     * @throws JsonException
      */
     private function reportErrors(array $kongErrors, array $certbotErrors, OutputInterface $output): void
     {
@@ -208,8 +196,6 @@ class UpdateCertificatesCommand extends Command
     /**
      * Validates user input
      *
-     * @param string   $email
-     * @param string   $kongAdminUri
      * @param string[] $domains
      *
      * @throws \InvalidArgumentException

@@ -12,25 +12,14 @@ use function trim;
  */
 class Certificate
 {
-    /**
-     * @var string
-     */
     private string $cert;
-
-    /**
-     * @var string
-     */
     private string $key;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $domains;
 
     /**
-     * @param string $cert
-     * @param string $key
-     * @param string[]  $domains
+     * @param string[] $domains
      */
     public function __construct(string $cert, string $key, array $domains)
     {
@@ -51,17 +40,11 @@ class Certificate
         $this->domains = $domains;
     }
 
-    /**
-     * @return string
-     */
     public function getCert(): string
     {
         return $this->cert;
     }
 
-    /**
-     * @return string
-     */
     public function getKey(): string
     {
         return $this->key;

@@ -21,32 +21,16 @@ class Handler
 {
     private const DEFAULT_CERTS_BASE_PATH = '/etc/letsencrypt/live';
 
-    /**
-     * @var Error[]
-     */
+    /** @var Error[] */
     private array $errors = [];
 
-    /**
-     * @var ShellExec
-     */
-    private ShellExec $shellExec;
-
-    /**
-     * @var string
-     */
     private string $certsBasePath;
 
-    public function __construct(ShellExec $shellExec)
+    public function __construct(private ShellExec $shellExec)
     {
-        $this->shellExec     = $shellExec;
         $this->certsBasePath = self::DEFAULT_CERTS_BASE_PATH;
     }
 
-    /**
-     * @param string $certsBasePath
-     *
-     * @return Handler
-     */
     public function setCertsBasePath(string $certsBasePath): self
     {
         $this->certsBasePath = $certsBasePath;

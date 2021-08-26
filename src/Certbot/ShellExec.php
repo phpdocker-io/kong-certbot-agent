@@ -15,9 +15,7 @@ use function exec;
  */
 class ShellExec
 {
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $output = [];
 
     public function exec(string $command): bool

@@ -17,28 +17,16 @@ use function sprintf;
  */
 class Handler
 {
-    /**
-     * @var ClientInterface
-     */
-    private ClientInterface $guzzle;
 
-    /**
-     * @var Error[]
-     */
+    /** @var Error[] */
     private array $errors = [];
 
-    public function __construct(ClientInterface $guzzle)
+    public function __construct(private ClientInterface $guzzle)
     {
-        $this->guzzle = $guzzle;
     }
 
     /**
      * Stores the given certificate in Kong.
-     *
-     * @param Certificate $certificate
-     * @param string      $kongAdminUri
-     *
-     * @return bool
      */
     public function store(Certificate $certificate, string $kongAdminUri): bool
     {
