@@ -20,7 +20,7 @@ phpdismod xdebug
 composer -o install
 
 # Static analysis
-vendor/bin/phpstan -v analyse -l 9 src && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
+vendor/bin/phpstan -v analyse -l 8 src && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
 
 # Run unit tests
 XDEBUG_MODE=coverage php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
