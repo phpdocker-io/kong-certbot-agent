@@ -3,8 +3,14 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Certbot;
 
+use InvalidArgumentException;
 use PhpDockerIo\KongCertbot\Certbot\Exception\CertFileNotFoundException;
 use PhpDockerIo\KongCertbot\Certificate;
+use RuntimeException;
+use function file_exists;
+use function file_get_contents;
+use function reset;
+use function sprintf;
 
 /**
  * Runs certbot to acquire certificate files for the list of domains, and returns a list of Certificates.
@@ -63,13 +69,13 @@ class Handler
     public function acquireCertificate(array $domains, string $email, bool $testCert): Certificate
     {
         // Domains are stored by certbot in a folder named after the first domain on the list
-        $firstDomain = \reset($domains);
+        $firstDomain = reset($domains);
 
         if ($firstDomain === false) {
-            throw new \InvalidArgumentException('Empty list of domains provided');
+            throw new InvalidArgumentException('Empty list of domains provided');
         }
 
-        $renewCmd = \sprintf(
+        $renewCmd = sprintf(
             'certbot certonly %s --agree-tos --standalone --preferred-challenges http -n -m %s --expand %s',
             $testCert ? '--test-cert' : '',
             $email,
@@ -80,25 +86,25 @@ class Handler
 
         if ($cmdStatus === false) {
             $this->errors[] = new Error($this->shellExec->getOutput(), 1, $domains);
-            throw new \RuntimeException('Certbot execution failed');
+            throw new RuntimeException('Certbot execution failed');
         }
 
         $basePath = sprintf('%s/%s', $this->certsBasePath, $firstDomain);
 
         // Ensure certs have actually been created
-        $fullChainPath = \sprintf('%s/fullchain.pem', $basePath);
-        if (\file_exists($fullChainPath) === false) {
+        $fullChainPath = sprintf('%s/fullchain.pem', $basePath);
+        if (file_exists($fullChainPath) === false) {
             throw new CertFileNotFoundException($fullChainPath, $domains);
         }
 
-        $privateKeyPath = \sprintf('%s/privkey.pem', $basePath);
-        if (\file_exists($privateKeyPath) === false) {
+        $privateKeyPath = sprintf('%s/privkey.pem', $basePath);
+        if (file_exists($privateKeyPath) === false) {
             throw new CertFileNotFoundException($privateKeyPath, $domains);
         }
 
         // Ensure certs are readable
-        $fullChain  = \file_get_contents($fullChainPath);
-        $privateKey = \file_get_contents($privateKeyPath);
+        $fullChain  = file_get_contents($fullChainPath);
+        $privateKey = file_get_contents($privateKeyPath);
 
         return new Certificate(
             $fullChain !== false ? $fullChain : '',

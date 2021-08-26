@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot;
 
+use InvalidArgumentException;
+use function count;
+use function trim;
+
 /**
  * Certificate data for a domain.
  */
@@ -30,16 +34,16 @@ class Certificate
      */
     public function __construct(string $cert, string $key, array $domains)
     {
-        if (\trim($cert) === '') {
-            throw new \InvalidArgumentException('Empty cert');
+        if (trim($cert) === '') {
+            throw new InvalidArgumentException('Empty cert');
         }
 
-        if (\trim($key) === '') {
-            throw new \InvalidArgumentException('Empty key');
+        if (trim($key) === '') {
+            throw new InvalidArgumentException('Empty key');
         }
 
-        if (\count($domains) === 0) {
-            throw new \InvalidArgumentException('Empty domains');
+        if (count($domains) === 0) {
+            throw new InvalidArgumentException('Empty domains');
         }
 
         $this->cert    = $cert;

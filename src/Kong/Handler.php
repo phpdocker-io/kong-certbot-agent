@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use PhpDockerIo\KongCertbot\Certificate;
 use function count;
 use function json_encode;
+use function sprintf;
 
 /**
  * Handles communication with Kong given a bunch of certificates.
@@ -58,7 +59,7 @@ class Handler
         try {
             $this->guzzle->request(
                 'put',
-                \sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
+                sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
                 $payload
             );
         } catch (BadResponseException $ex) {
@@ -67,7 +68,7 @@ class Handler
 
             $responseCode = $ex->getResponse()->getStatusCode();
 
-            $summary = \sprintf(
+            $summary = sprintf(
                 'Kong error %s: %s. Request method `%s`, headers %s, body %s',
                 $ex->getResponse()->getStatusCode(),
                 $message,

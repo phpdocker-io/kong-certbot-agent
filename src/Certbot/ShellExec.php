@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace PhpDockerIo\KongCertbot\Certbot;
 
 use RuntimeException;
+use function escapeshellcmd;
+use function exec;
 
 /**
  * Runs a command on the shell.
@@ -22,7 +24,7 @@ class ShellExec
     {
         $cmdStatus = 1;
 
-        \exec(\escapeshellcmd($command), $this->output, $cmdStatus);
+        exec(escapeshellcmd($command), $this->output, $cmdStatus);
 
         return $cmdStatus === 0;
     }
