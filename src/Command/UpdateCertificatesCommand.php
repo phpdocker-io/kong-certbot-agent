@@ -199,7 +199,7 @@ class UpdateCertificatesCommand extends Command
             $output->writeln(sprintf(
                 'Certbot error: command status %s, output `%s`, domains %s',
                 $certbotError->getCmdStatus(),
-                json_encode($certbotError->getCmdOutput()),
+                json_encode($certbotError->getCmdOutput(), JSON_THROW_ON_ERROR),
                 implode(', ', $certbotError->getDomains())
             ));
         }
