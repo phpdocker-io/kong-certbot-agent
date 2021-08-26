@@ -22,14 +22,11 @@ use function touch;
 
 class HandlerTest extends TestCase
 {
-    /** @var ShellExec|MockObject */
-    private MockObject $shellExec;
-
-    private Handler $handler;
+    private ShellExec|MockObject $shellExec;
+    private Handler              $handler;
 
     private string $certsBasePath = __DIR__ . '/fixtures';
-
-    private string $tmpCertPath = '/tmp/foo.bar';
+    private string $tmpCertPath   = '/tmp/foo.bar';
 
     public function setUp(): void
     {

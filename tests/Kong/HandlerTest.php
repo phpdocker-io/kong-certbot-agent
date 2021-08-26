@@ -20,10 +20,8 @@ class HandlerTest extends TestCase
 {
     private const KONG_ADMIN_URI = 'http://foo/bar';
 
-    private Handler $handler;
-
-    /** @var Client|MockObject */
-    private MockObject $httpClient;
+    private Handler           $handler;
+    private Client|MockObject $httpClient;
 
     public function setUp(): void
     {

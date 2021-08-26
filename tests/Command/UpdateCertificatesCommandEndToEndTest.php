@@ -21,18 +21,12 @@ use Symfony\Component\Console\Tester\CommandTester;
 class UpdateCertificatesCommandEndToEndTest extends TestCase
 {
     private const CERTS_BASE_PATH = __DIR__ . '/fixtures';
+    private const MAIN_DOMAIN     = 'foo.bar';
+    private const KONG_ENDPOINT   = 'http://foo/bar';
 
-    private const MAIN_DOMAIN = 'foo.bar';
-
-    private const KONG_ENDPOINT = 'http://foo/bar';
-
-    /** @var ClientInterface|MockObject */
-    private MockObject $httpClient;
-
-    /** @var ShellExec|MockObject */
-    private MockObject $shellExec;
-
-    private CommandTester $command;
+    private ClientInterface|MockObject $httpClient;
+    private ShellExec|MockObject       $shellExec;
+    private CommandTester              $command;
 
     public function setUp(): void
     {

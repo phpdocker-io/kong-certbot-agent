@@ -19,13 +19,9 @@ use function implode;
 
 class UpdateCertificatesCommandTest extends TestCase
 {
-    /** @var Kong|MockObject */
-    private MockObject $kong;
-
-    /** @var Certbot|MockObject */
-    private MockObject $certbot;
-
-    private CommandTester $command;
+    private Kong|MockObject    $kong;
+    private Certbot|MockObject $certbot;
+    private CommandTester      $command;
 
     public function setUp(): void
     {
