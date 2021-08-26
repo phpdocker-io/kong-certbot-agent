@@ -8,10 +8,10 @@
   },
   "license": "MIT",
   "require":  {
-    "ext-json":          "*",
-    "ext-curl":          "*",
-    "php":               "^8.0",
-    "guzzlehttp/guzzle": "^6.3",
+    "php": "^8.0",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "guzzlehttp/guzzle": "^7.3",
     "symfony/console":   "^5.0"
   },
   "require-dev": {
