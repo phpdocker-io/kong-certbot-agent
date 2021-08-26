@@ -20,15 +20,10 @@ class HandlerTest extends TestCase
 {
     private const KONG_ADMIN_URI = 'http://foo/bar';
 
-    /**
-     * @var Handler
-     */
-    private $handler;
+    private Handler $handler;
 
-    /**
-     * @var Client|MockObject
-     */
-    private $httpClient;
+    /** @var Client|MockObject */
+    private MockObject $httpClient;
 
     public function setUp(): void
     {
@@ -137,7 +132,7 @@ class HandlerTest extends TestCase
 
         $body
             ->method('getContents')
-            ->willReturn(json_encode(['foo']));
+            ->willReturn(json_encode(['foo'], JSON_THROW_ON_ERROR));
 
         $request
             ->method('getBody')

@@ -22,19 +22,14 @@ use function touch;
 
 class HandlerTest extends TestCase
 {
-    /**
-     * @var ShellExec|MockObject
-     */
-    private $shellExec;
+    /** @var ShellExec|MockObject */
+    private MockObject $shellExec;
 
-    /**
-     * @var Handler
-     */
-    private $handler;
+    private Handler $handler;
 
-    private $certsBasePath = __DIR__ . '/fixtures';
+    private string $certsBasePath = __DIR__ . '/fixtures';
 
-    private $tmpCertPath = '/tmp/foo.bar';
+    private string $tmpCertPath = '/tmp/foo.bar';
 
     public function setUp(): void
     {
@@ -193,7 +188,7 @@ class HandlerTest extends TestCase
     public function booleanDataProvider(): array
     {
         return [
-            'true' => [true],
+            'true'  => [true],
             'false' => [false],
         ];
     }

@@ -27,20 +27,13 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
     private const KONG_ENDPOINT = 'http://foo/bar';
 
-    /**
-     * @var ClientInterface|MockObject
-     */
-    private $httpClient;
+    /** @var ClientInterface|MockObject */
+    private MockObject $httpClient;
 
-    /**
-     * @var ShellExec|MockObject
-     */
-    private $shellExec;
+    /** @var ShellExec|MockObject */
+    private MockObject $shellExec;
 
-    /**
-     * @var CommandTester
-     */
-    private $command;
+    private CommandTester $command;
 
     public function setUp(): void
     {
