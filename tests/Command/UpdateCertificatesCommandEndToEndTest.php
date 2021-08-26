@@ -10,6 +10,7 @@ use PhpDockerIo\KongCertbot\Command\UpdateCertificatesCommand;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
 use PHPStan\Testing\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 
@@ -93,7 +94,7 @@ class UpdateCertificatesCommandEndToEndTest extends TestCase
 
                 return true;
             }))
-            ->willReturn(true);
+            ->willReturn($this->createMock(ResponseInterface::class));
 
         self::assertSame(0, $this->command->execute([
             'email'         => $email,
