@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\PhpDockerIo\KongCertbot;
 
+use InvalidArgumentException;
 use PhpDockerIo\KongCertbot\Certificate;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +16,7 @@ class CertificateTest extends TestCase
      */
     public function constructorHandlesEmptyCert(string $emptyString): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Empty cert');
 
         new Certificate($emptyString, 'foo', ['bar']);
@@ -28,7 +29,7 @@ class CertificateTest extends TestCase
      */
     public function constructorHandlesEmptyKey(string $emptyString): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Empty key');
 
         new Certificate('foo', $emptyString, ['bar']);
@@ -39,7 +40,7 @@ class CertificateTest extends TestCase
      */
     public function constructorHandlesEmptyListOfDomains(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Empty domains');
 
         new Certificate('bar', 'foo', []);
@@ -55,7 +56,7 @@ class CertificateTest extends TestCase
                 '
             ',
             ],
-            'many spaces' => ['     '],
+            'many spaces'  => ['     '],
         ];
     }
 }

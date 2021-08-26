@@ -12,7 +12,7 @@ params:
 image_resource:
   type: docker-image
   source:
-    repository: phpdockerio/php74-cli
+    repository: phpdockerio/php80-cli
 
 caches:
   - path: code/vendor

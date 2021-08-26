@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PhpDockerIo\KongCertbot\Command;
 
+use JsonException;
 use PhpDockerIo\KongCertbot\Certbot\Error as CertbotError;
 use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Kong\Error as KongError;
@@ -13,6 +14,15 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
+use function count;
+use function explode;
+use function filter_var;
+use function get_class;
+use function implode;
+use function json_encode;
+use function sprintf;
+use function trim;
 
 /**
  * Handles requesting certificates for a given list of domains off Let's Encrypt via certbot's standalone method - it
@@ -27,22 +37,9 @@ class UpdateCertificatesCommand extends Command
 {
     private const COMMAND_NAME = 'certs:update';
 
-    /**
-     * @var Kong
-     */
-    private Kong $kong;
-
-    /**
-     * @var Certbot
-     */
-    private Certbot $certbot;
-
-    public function __construct(Kong $kong, Certbot $certbot, string $certsBasePath = null)
+    public function __construct(private Kong $kong, private Certbot $certbot, string $certsBasePath = null)
     {
         parent::__construct(self::COMMAND_NAME);
-
-        $this->kong    = $kong;
-        $this->certbot = $certbot;
 
         if ($certsBasePath !== null) {
             $this->certbot->setCertsBasePath($certsBasePath);
@@ -88,6 +85,7 @@ class UpdateCertificatesCommand extends Command
      * @return int
      *
      * @throws InvalidArgumentException
+     * @throws JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -104,7 +102,7 @@ class UpdateCertificatesCommand extends Command
 
         $domains = $this->parseDomains($concatDomains);
 
-        $outputDomains = \implode(', ', $domains);
+        $outputDomains = implode(', ', $domains);
 
         /** @var bool $testCert */
         $testCert = $input->getOption('test-cert');
@@ -114,21 +112,21 @@ class UpdateCertificatesCommand extends Command
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
         // and we defer error handling until they're stored
         try {
-            $output->writeln(\sprintf('Updating certificates config for %s', $outputDomains));
+            $output->writeln(sprintf('Updating certificates config for %s', $outputDomains));
             $certificate = $this->certbot->acquireCertificate($domains, $email, $testCert);
 
             // Store certs into kong via the admin UI. Again, not all-or-nothing
             if ($this->kong->store($certificate, $kongAdminUri) === true) {
-                $certOrCerts = \count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
+                $certOrCerts = count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
 
-                $output->writeln(\sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
+                $output->writeln(sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
             }
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             // If no errors listed, unhandled exception
-            if (\count($this->kong->getErrors()) === 0 && \count($this->certbot->getErrors()) === 0) {
-                $output->writeln(\sprintf(
+            if (count($this->kong->getErrors()) === 0 && count($this->certbot->getErrors()) === 0) {
+                $output->writeln(sprintf(
                     'Unexpected error %s - %s',
-                    \get_class($ex),
+                    get_class($ex),
                     $ex->getMessage()
                 ));
 
@@ -138,8 +136,9 @@ class UpdateCertificatesCommand extends Command
 
         // Capture errors for reporting - some certs might have succeeded, but we do need to
         // exit appropriately for whatever orchestrator to realise there were problems
-        if (\count($this->kong->getErrors()) > 0 || \count($this->certbot->getErrors()) > 0) {
+        if (count($this->kong->getErrors()) > 0 || count($this->certbot->getErrors()) > 0) {
             $this->reportErrors($this->kong->getErrors(), $this->certbot->getErrors(), $output);
+
             return 1;
         }
 
@@ -150,15 +149,13 @@ class UpdateCertificatesCommand extends Command
      * Parses the list of domains given from the command line, cleans it up and returns it as an array
      * of individual domains.
      *
-     * @param string $concatDomains
-     *
      * @return string[]
      */
     private function parseDomains(string $concatDomains): array
     {
         $domains = [];
-        foreach (\explode(',', $concatDomains) as $domain) {
-            $domain = \trim($domain);
+        foreach (explode(',', $concatDomains) as $domain) {
+            $domain = trim($domain);
             if (empty($domain) === false) {
                 $domains[] = $domain;
             }
@@ -170,28 +167,28 @@ class UpdateCertificatesCommand extends Command
     /**
      * List kong and certbot errors.
      *
-     * @param KongError[]     $kongErrors
-     * @param CertbotError[]  $certbotErrors
-     * @param OutputInterface $output
+     * @param KongError[]    $kongErrors
+     * @param CertbotError[] $certbotErrors
+     *
+     * @throws JsonException
      */
     private function reportErrors(array $kongErrors, array $certbotErrors, OutputInterface $output): void
     {
         foreach ($kongErrors as $kongError) {
-            $output->writeln(\sprintf(
+            $output->writeln(sprintf(
                 'Kong error: code %s, message %s, domains %s',
                 $kongError->getCode(),
                 $kongError->getMessage(),
-                \implode(', ', $kongError->getDomains())
+                implode(', ', $kongError->getDomains())
             ));
         }
 
-
         foreach ($certbotErrors as $certbotError) {
-            $output->writeln(\sprintf(
+            $output->writeln(sprintf(
                 'Certbot error: command status %s, output `%s`, domains %s',
                 $certbotError->getCmdStatus(),
-                \json_encode($certbotError->getCmdOutput()),
-                \implode(', ', $certbotError->getDomains())
+                json_encode($certbotError->getCmdOutput(), JSON_THROW_ON_ERROR),
+                implode(', ', $certbotError->getDomains())
             ));
         }
     }
@@ -199,23 +196,21 @@ class UpdateCertificatesCommand extends Command
     /**
      * Validates user input
      *
-     * @param string   $email
-     * @param string   $kongAdminUri
      * @param string[] $domains
      *
      * @throws \InvalidArgumentException
      */
     private function validateInput(string $email, string $kongAdminUri, array $domains): void
     {
-        if (\filter_var($email, FILTER_VALIDATE_EMAIL) !== $email) {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) !== $email) {
             throw new \InvalidArgumentException(sprintf('Invalid email %s', $email));
         }
 
-        if (\filter_var($kongAdminUri, FILTER_VALIDATE_URL) !== $kongAdminUri) {
+        if (filter_var($kongAdminUri, FILTER_VALIDATE_URL) !== $kongAdminUri) {
             throw new \InvalidArgumentException(sprintf('Invalid kong admin endpoint %s', $kongAdminUri));
         }
 
-        if (\count($domains) === 0) {
+        if (count($domains) === 0) {
             throw new \InvalidArgumentException('Empty list of domains given - expect comma-separated');
         }
     }

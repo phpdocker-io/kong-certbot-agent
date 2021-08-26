@@ -6,30 +6,11 @@ namespace PhpDockerIo\KongCertbot\Certbot;
 class Error
 {
     /**
-     * @var string[]
-     */
-    private array $cmdOutput;
-
-    /**
-     * @var int
-     */
-    private int $cmdStatus;
-
-    /**
-     * @var string[]
-     */
-    private array $domains;
-
-    /**
      * @param string[] $cmdOutput
-     * @param int      $cmdStatus
-     * @param string[]    $domains
+     * @param string[] $domains
      */
-    public function __construct(array $cmdOutput, int $cmdStatus, array $domains)
+    public function __construct(private array $cmdOutput, private int $cmdStatus, private array $domains)
     {
-        $this->cmdOutput = $cmdOutput;
-        $this->cmdStatus = $cmdStatus;
-        $this->domains   = $domains;
     }
 
     /**
@@ -40,9 +21,6 @@ class Error
         return $this->cmdOutput;
     }
 
-    /**
-     * @return int
-     */
     public function getCmdStatus(): int
     {
         return $this->cmdStatus;

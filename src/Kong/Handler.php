@@ -6,6 +6,9 @@ namespace PhpDockerIo\KongCertbot\Kong;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use PhpDockerIo\KongCertbot\Certificate;
+use function count;
+use function json_encode;
+use function sprintf;
 
 /**
  * Handles communication with Kong given a bunch of certificates.
@@ -14,28 +17,16 @@ use PhpDockerIo\KongCertbot\Certificate;
  */
 class Handler
 {
-    /**
-     * @var ClientInterface
-     */
-    private ClientInterface $guzzle;
 
-    /**
-     * @var Error[]
-     */
+    /** @var Error[] */
     private array $errors = [];
 
-    public function __construct(ClientInterface $guzzle)
+    public function __construct(private ClientInterface $guzzle)
     {
-        $this->guzzle = $guzzle;
     }
 
     /**
      * Stores the given certificate in Kong.
-     *
-     * @param Certificate $certificate
-     * @param string      $kongAdminUri
-     *
-     * @return bool
      */
     public function store(Certificate $certificate, string $kongAdminUri): bool
     {
@@ -56,33 +47,28 @@ class Handler
         try {
             $this->guzzle->request(
                 'put',
-                \sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
+                sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
                 $payload
             );
         } catch (BadResponseException $ex) {
-            $request  = $ex->getRequest();
-            $response = $ex->getResponse();
-            $message  = $ex->getMessage();
+            $request = $ex->getRequest();
+            $message = $ex->getMessage();
 
-            if ($response === null) {
-                $message = 'empty response';
-            }
+            $responseCode = $ex->getResponse()->getStatusCode();
 
-            $responseCode = $ex->getResponse() !== null ? $ex->getResponse()->getStatusCode() : $ex->getCode();
-
-            $summary = \sprintf(
+            $summary = sprintf(
                 'Kong error %s: %s. Request method `%s`, headers %s, body %s',
-                $responseCode,
+                $ex->getResponse()->getStatusCode(),
                 $message,
                 $request->getMethod(),
-                \json_encode($request->getHeaders()),
-                \json_encode($request->getBody()->getContents())
+                json_encode($request->getHeaders(), JSON_THROW_ON_ERROR),
+                json_encode($request->getBody()->getContents(), JSON_THROW_ON_ERROR)
             );
 
             $this->errors[] = new Error($responseCode, $certificate->getDomains(), $summary);
         }
 
-        return \count($this->errors) === 0;
+        return count($this->errors) === 0;
     }
 
     /**

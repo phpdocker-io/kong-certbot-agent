@@ -13,20 +13,15 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use function json_encode;
+use function sprintf;
 
 class HandlerTest extends TestCase
 {
     private const KONG_ADMIN_URI = 'http://foo/bar';
 
-    /**
-     * @var Handler
-     */
-    private $handler;
-
-    /**
-     * @var Client|MockObject
-     */
-    private $httpClient;
+    private Handler           $handler;
+    private Client|MockObject $httpClient;
 
     public function setUp(): void
     {
@@ -104,7 +99,7 @@ class HandlerTest extends TestCase
         $domains     = ['foo.bar', 'bar.foo', 'doom.bar'];
         $certificate = new Certificate('foo', 'bar', $domains);
 
-        $expectedErrorMessage = \sprintf(
+        $expectedErrorMessage = sprintf(
             'Kong error %s: foobar. Request method `put`, headers {"content-type":"application\/json"}, body "[\"foo\"]"',
             $statusCode
         );
@@ -123,26 +118,21 @@ class HandlerTest extends TestCase
         $body = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $response
-            ->expects(self::any())
             ->method('getStatusCode')
             ->willReturn($statusCode);
 
         $response
-            ->expects(self::any())
             ->method('getBody')
             ->willReturn($body);
 
         $body
-            ->expects(self::any())
             ->method('rewind');
 
         $body
-            ->expects(self::any())
             ->method('getContents')
-            ->willReturn(\json_encode(['foo']));
+            ->willReturn(json_encode(['foo'], JSON_THROW_ON_ERROR));
 
         $request
-            ->expects(self::any())
             ->method('getBody')
             ->willReturn($body);
 
@@ -177,63 +167,5 @@ class HandlerTest extends TestCase
             'http 400' => [400],
             'http 500' => [500],
         ];
-    }
-
-    /**
-     * @test
-     */
-    public function storeHadlesKongEmptyResponse(): void
-    {
-        $domains     = ['foo.bar', 'bar.foo', 'doom.bar'];
-        $certificate = new Certificate('foo', 'bar', $domains);
-
-        $expectedErrorMessage = \sprintf(
-            'Kong error %s: empty response. Request method `put`, headers {"content-type":"application\/json"}, body "[\"foo\"]"',
-            0
-        );
-
-        $exceptionMessage = 'foobar';
-
-        $headers = ['content-type' => 'application/json'];
-
-        /** @var RequestInterface|MockObject $request */
-        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
-
-        /** @var StreamInterface|MockObject $body */
-        $body = $this->getMockBuilder(StreamInterface::class)->getMock();
-
-        $body
-            ->expects(self::any())
-            ->method('getContents')
-            ->willReturn(\json_encode(['foo']));
-
-        $request
-            ->expects(self::any())
-            ->method('getBody')
-            ->willReturn($body);
-
-        $request
-            ->expects(self::any())
-            ->method('getHeaders')
-            ->willReturn($headers);
-
-        $request
-            ->expects(self::any())
-            ->method('getMethod')
-            ->willReturn('put');
-
-        $exception = new ClientException($exceptionMessage, $request, null);
-
-        $this->httpClient
-            ->expects(self::once())
-            ->method('request')
-            ->willThrowException($exception);
-
-        $expectedErrors = [
-            new Error(0, $domains, $expectedErrorMessage),
-        ];
-
-        self::assertFalse($this->handler->store($certificate, self::KONG_ADMIN_URI));
-        self::assertEquals($expectedErrors, $this->handler->getErrors());
     }
 }
