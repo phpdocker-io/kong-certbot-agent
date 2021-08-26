@@ -118,6 +118,14 @@ docker run -it --rm \
     -e TEST_CERT=true \
     phpdockerio/kong-certbot-agent
 
+# Get a certificate for a single domain, and submit to kong
+# Kong's admin API is behind a self-signed certificate
+docker run -it --rm \
+    -e KONG_ENDPOINT=http://kong-admin:8001 \
+    -e EMAIL=foo@bar.com \
+    -e DOMAINS=bar.com \
+    -e ALLOW_SELF_SIGNED_CERT_KONG=true \
+    phpdockerio/kong-certbot-agent
 ```
 
 ## FAQ
