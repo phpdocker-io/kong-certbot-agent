@@ -9,4 +9,4 @@ if [[ ! -z "${ALLOW_SELF_SIGNED_CERT_KONG}" ]]; then
     EXTRA_PARAMS="${EXTRA_PARAMS} --allow-self-signed-cert-kong"
 fi;
 
-echo /workdir/certbot-agent certs:update ${EXTRA_PARAMS} ${KONG_ENDPOINT} ${EMAIL} ${DOMAINS}
+exec /workdir/certbot-agent certs:update ${EXTRA_PARAMS} ${KONG_ENDPOINT} ${EMAIL} ${DOMAINS}
