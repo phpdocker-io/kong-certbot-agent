@@ -1,6 +1,6 @@
 [![Build status](![Tests](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml/badge.svg))](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml)
 [![Code coverage](https://codecov.io/gh/luispabon/kong-certbot-agent/branch/master/graph/badge.svg)](https://codecov.io/gh/luispabon/kong-certbot-agent)
-[![Docker build](![Docker build](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/publish.yaml/badge.svg))](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml)
+[![Docker build](![Docker build](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/publish.yaml/badge.svg))](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/publish.yaml)
 
 # Kong Certbot agent
 Let's Encrypt integration with Kong
