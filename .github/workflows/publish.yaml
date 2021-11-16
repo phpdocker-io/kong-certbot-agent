@@ -38,12 +38,9 @@ jobs:
         run: |
           TAGS=$(cat release | awk '{print "phpdockerio/kong-certbot-agent:latest,phpdockerio/kong-certbot-agent:" $1 ",phpdockerio/kong-certbot-agent:" $2 ",phpdockerio/kong-certbot-agent:" $3}')
           echo "::set-output name=tags::${TAGS}"
-          echo ${TAGS}
+          echo "Docker tags to build: ${TAGS}"
 
-      - name: debug
-        run: "echo ${{ steps.container.outputs.tags }}"
-
-      - name: Build and push primary container
+      - name: Build & push container image
         uses: docker/build-push-action@v2
         with:
           context: .
