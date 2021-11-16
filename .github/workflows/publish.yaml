@@ -1,4 +1,4 @@
-name: Deploy application
+name: Docker build & publish
 
 on:
   # Ensure we're run after tests
