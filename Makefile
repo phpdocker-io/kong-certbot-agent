@@ -97,9 +97,6 @@ composer-install:
 #### Tests & ci
 prep-ci: composer-install
 
-#behaviour:
-#	$(PHP_RUN) vendor/bin/behat --colors
-#
 static-analysis:
 	$(PHP_RUN) vendor/bin/phpstan --ansi -v analyse -l 8 src
 
