@@ -8,8 +8,8 @@ use PhpDockerIo\KongCertbot\Certbot\Handler as Certbot;
 use PhpDockerIo\KongCertbot\Certbot\ShellExec;
 use PhpDockerIo\KongCertbot\Command\UpdateCertificatesCommand;
 use PhpDockerIo\KongCertbot\Kong\Handler as Kong;
-use PHPStan\Testing\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
