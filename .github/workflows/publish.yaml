@@ -40,6 +40,9 @@ jobs:
           echo "::set-output name=tags::${TAGS}"
           echo ${TAGS}
 
+      - name: debug
+        run: "echo ${{ steps.container.tags }}"
+
       - name: Build and push primary container
         uses: docker/build-push-action@v2
         with:
