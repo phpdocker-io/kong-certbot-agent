@@ -37,7 +37,7 @@ jobs:
         id: container
         run: |
           TAGS=$(cat release | awk '{print "phpdockerio/kong-certbot-agent:latest,phpdockerio/kong-certbot-agent:" $1 ",phpdockerio/kong-certbot-agent:" $2 ",phpdockerio/kong-certbot-agent:" $3}')
-          echo "::set-output name=tags::'${TAGS}'"
+          echo "::set-output name=tags::${TAGS}"
           echo ${TAGS}
 
       - name: debug
