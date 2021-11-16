@@ -38,6 +38,7 @@ jobs:
         run: |
           TAGS=$(cat release | awk '{print "phpdockerio/kong-certbot-agent:latest,phpdockerio/kong-certbot-agent:" $1 ",phpdockerio/kong-certbot-agent:" $2 ",phpdockerio/kong-certbot-agent:" $3}')
           echo "::set-output name=tags::${TAGS}"
+          echo ${TAGS}
 
       - name: Build and push primary container
         uses: docker/build-push-action@v2
