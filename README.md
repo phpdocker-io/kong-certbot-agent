@@ -1,5 +1,6 @@
-[![Build status](https://ci.auronconsulting.co.uk/api/v1/teams/main/pipelines/kong-certbot-agent-master/jobs/analyze-master/badge)](https://ci.auronconsulting.co.uk/teams/main/pipelines/kong-certbot-agent-master)
+[![Build status](![Tests](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml/badge.svg))](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml)
 [![Code coverage](https://codecov.io/gh/luispabon/kong-certbot-agent/branch/master/graph/badge.svg)](https://codecov.io/gh/luispabon/kong-certbot-agent)
+[![Docker build](![Docker build](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/publish.yaml/badge.svg))](https://github.com/phpdocker-io/kong-certbot-agent/actions/workflows/tests.yaml)
 
 # Kong Certbot agent
 Let's Encrypt integration with Kong
