@@ -4,7 +4,7 @@
 #HOSTS_VERSION=3.6.4
 #HOSTS_LOCATION=bin/hosts
 #SITE_HOST=phpdocker.local
-PHP_RUN=docker run --rm -e XDEBUG_MODE=coverage -v ".:/workdir" --rm phpdockerio/php80-cli
+PHP_RUN=docker run --rm -e XDEBUG_MODE=coverage -v "$(PWD):/workdir" --rm phpdockerio/php80-cli
 #
 #BUILD_TAG?:=$(shell date +'%Y-%m-%d-%H-%M-%S')-$(shell git rev-parse --short HEAD)
 #
