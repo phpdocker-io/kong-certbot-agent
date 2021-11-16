@@ -36,7 +36,7 @@ jobs:
       - name: Work out tags
         id: container
         run: |
-          TAGS=`cat release | awk '{print "phpdockerio/kong-certbot-agent:latest,phpdockerio/kong-certbot-agent:" $1 ",phpdockerio/kong-certbot-agent:" $2 ",phpdockerio/kong-certbot-agent:" $3}'`
+          TAGS=$(cat release | awk '{print "phpdockerio/kong-certbot-agent:latest,phpdockerio/kong-certbot-agent:" $1 ",phpdockerio/kong-certbot-agent:" $2 ",phpdockerio/kong-certbot-agent:" $3}')
           echo "::set-output name=tags::${TAGS}"
 
       - name: Build and push primary container
@@ -46,5 +46,5 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           pull: true
-          tags: ${{ steps.container.tags }}"
+          tags: "${{ steps.container.tags }}"
 
