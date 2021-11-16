@@ -4,7 +4,7 @@
 #HOSTS_VERSION=3.6.4
 #HOSTS_LOCATION=bin/hosts
 #SITE_HOST=phpdocker.local
-PHP_RUN=docker-compose run -e XDEBUG_MODE=coverage --rm php-fpm
+PHP_RUN=docker run --rm -it -e XDEBUG_MODE=coverage --rm phpdockerio/php80-cli
 #
 #BUILD_TAG?:=$(shell date +'%Y-%m-%d-%H-%M-%S')-$(shell git rev-parse --short HEAD)
 #
@@ -100,11 +100,6 @@ prep-ci: composer-install
 #behaviour:
 #	$(PHP_RUN) vendor/bin/behat --colors
 #
-
-# Used on github action to find composer's cache folder, for build caching
-composer-cache-dir:
-	@composer config cache-files-dir
-
 static-analysis:
 	$(PHP_RUN) vendor/bin/phpstan --ansi -v analyse -l 8 src
 
