@@ -1,0 +1,42 @@
+name: "Test application"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+  # Allow workflow to be manually run from the GitHub UI
+  workflow_dispatch:
+
+jobs:
+  tests:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Initialise environment
+        run: make prep-ci
+
+      - name: Run static analysis
+        run: make static-analysis
+
+      - name: Run unit and functional tests
+        run: make coverage-tests
+
+      - name: Run mutation tests
+        run: make mutation-tests
+
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./reports/phpunit/coverage.xml # optional
+          flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: false # optional (default = false)
