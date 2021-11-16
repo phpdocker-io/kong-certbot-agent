@@ -100,9 +100,11 @@ prep-ci: composer-install
 #behaviour:
 #	$(PHP_RUN) vendor/bin/behat --colors
 #
-#composer-cache-dir:
-#	@composer config cache-files-dir
-#
+
+# Used on github action to find composer's cache folder, for build caching
+composer-cache-dir:
+	@composer config cache-files-dir
+
 static-analysis:
 	$(PHP_RUN) vendor/bin/phpstan --ansi -v analyse -l 8 src
 
