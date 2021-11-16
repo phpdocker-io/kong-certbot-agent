@@ -44,6 +44,11 @@ jobs:
       - task: run_tests
         file: code/concourse/task-run-tests.yaml
 
+      - put: container-registry
+        params:
+          build: code
+          tag_as_latest: true
+          additional_tags: code/release
         on_failure:
           put: master-status
           params: { state: "failure", commit: "code" }
@@ -51,14 +56,3 @@ jobs:
       - put: notify-build-success
         resource: master-status
         params: { state: "success", commit: "code" }
-
-      - put: container-registry
-        params:
-          build: code
-          tag_as_latest: true
-          additional_tags: code/release
-
-      - task: code_coverage_reports
-        params:
-          CODECOV_TOKEN: {{codecov-token}}
-        file: code/concourse/task-codecov.yaml
