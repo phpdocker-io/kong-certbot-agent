@@ -41,7 +41,7 @@ jobs:
           echo ${TAGS}
 
       - name: debug
-        run: "echo ${{ steps.container.tags }}"
+        run: "echo ${{ steps.container.outputs.tags }}"
 
       - name: Build and push primary container
         uses: docker/build-push-action@v2
@@ -50,5 +50,5 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           pull: true
-          tags: "${{ steps.container.tags }}"
+          tags: "${{ steps.container.outputs.tags }}"
 
