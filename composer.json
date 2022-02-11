@@ -20,5 +20,10 @@
     "infection/infection": "^0.25.0",
     "symfony/var-dumper": "^5.0",
     "phpstan/phpstan": "^1.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "infection/extension-installer": true
+    }
   }
 }
