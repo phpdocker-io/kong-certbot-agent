@@ -1,4 +1,4 @@
-FROM phpdockerio/php80-cli
+FROM phpdockerio/php:8.1-cli
 MAINTAINER https://phpdocker.io
 
 WORKDIR /workdir
