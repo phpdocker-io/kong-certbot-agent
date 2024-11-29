@@ -87,7 +87,7 @@ class Handler
         }
 
         // Ensure certs are readable
-        $fullChain  = file_get_contents($fullChainPath);
+        $fullChain = file_get_contents($fullChainPath);
         $privateKey = file_get_contents($privateKeyPath);
 
         return new Certificate(

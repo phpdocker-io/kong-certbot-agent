@@ -28,7 +28,7 @@ class Handler
     /**
      * Stores the given certificate in Kong.
      */
-    public function store(Certificate $certificate, string $kongAdminUri): bool
+    public function store(Certificate $certificate, string $kongAdminUri, bool $allowSelfSignedCert): bool
     {
         $payload = [
             'headers' => [
@@ -39,6 +39,7 @@ class Handler
                 'key'  => $certificate->getKey(),
                 'snis' => $certificate->getDomains(),
             ],
+            'verify'  => !$allowSelfSignedCert,
         ];
 
         // From Kong 0.14, they finally fixed PUT as UPSERT
@@ -46,9 +47,9 @@ class Handler
         // certificate object within Kong
         try {
             $this->guzzle->request(
-                'put',
-                sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
-                $payload
+                method: 'put',
+                uri: sprintf('%s/certificates/%s', $kongAdminUri, $certificate->getDomains()[0]),
+                options: $payload,
             );
         } catch (BadResponseException $ex) {
             $request = $ex->getRequest();

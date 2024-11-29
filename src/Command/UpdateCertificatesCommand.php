@@ -56,25 +56,31 @@ class UpdateCertificatesCommand extends Command
         $this
             ->setDescription('Requests certificates from Let\'s Encrypt for the given domains and notifies Kong')
             ->addArgument(
-                'kong-endpoint',
-                InputArgument::REQUIRED,
-                'Base URL to Kong Admin API; eg: https://foo:8001'
+                name: 'kong-endpoint',
+                mode: InputArgument::REQUIRED,
+                description: 'Base URL to Kong Admin API; eg: https://foo:8001'
             )
             ->addArgument(
-                'email',
-                InputArgument::REQUIRED,
-                'Email the set of domains is to be associated with at Let\'s Encrypt'
+                name: 'email',
+                mode: InputArgument::REQUIRED,
+                description: 'Email the set of domains is to be associated with at Let\'s Encrypt'
             )
             ->addArgument(
-                'domains',
-                InputArgument::REQUIRED,
-                'Comma separated list of domains to request certs for; eg: bar.com,foo.bar.com'
+                name: 'domains',
+                mode: InputArgument::REQUIRED,
+                description: 'Comma separated list of domains to request certs for; eg: bar.com,foo.bar.com'
             )
             ->addOption(
-                'test-cert',
-                't',
-                InputOption::VALUE_NONE,
-                'Require test certificate from staging-letsencrypt'
+                name: 'test-cert',
+                shortcut: 't',
+                mode: InputOption::VALUE_NONE,
+                description: 'Require test certificate from staging-letsencrypt'
+            )
+            ->addOption(
+                name: 'allow-self-signed-cert-kong',
+                shortcut: '-s',
+                mode: InputOption::VALUE_NONE,
+                description: "Allow self signed certs in Kong's admin endpoint",
             );
     }
 
@@ -107,6 +113,9 @@ class UpdateCertificatesCommand extends Command
         /** @var bool $testCert */
         $testCert = $input->getOption('test-cert');
 
+        /** @var bool $allowSelfSignedCert */
+        $allowSelfSignedCert = $input->getOption('allow-self-signed-cert-kong');
+
         $this->validateInput($email, $kongAdminUri, $domains);
 
         // Acquire certificates from certbot. This is not all-or-nothing, whatever certs we acquire come out here
@@ -116,7 +125,7 @@ class UpdateCertificatesCommand extends Command
             $certificate = $this->certbot->acquireCertificate($domains, $email, $testCert);
 
             // Store certs into kong via the admin UI. Again, not all-or-nothing
-            if ($this->kong->store($certificate, $kongAdminUri) === true) {
+            if ($this->kong->store($certificate, $kongAdminUri, $allowSelfSignedCert) === true) {
                 $certOrCerts = count($certificate->getDomains()) > 1 ? 'Certificates' : 'Certificate';
 
                 $output->writeln(sprintf('%s for %s correctly sent to Kong', $certOrCerts, $outputDomains));
